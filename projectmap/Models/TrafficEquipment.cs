@@ -20,5 +20,6 @@ namespace projectmap.Models
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
         public virtual ICollection<RepairDetails>? RepairDetails { get; set; }
+        public virtual ICollection<RepairRecord>? RepairRecords { get; set; }
     }
 }

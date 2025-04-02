@@ -22,14 +22,14 @@ namespace projectmap.Service
         {
             try
             {
-                var checkData = _context.trafficEquipments.FirstOrDefault(x => x.Longitude == data.Longitude && x.Latitude == data.Latitude);
+                var checkData = _context.trafficequipments.FirstOrDefault(x => x.Longitude == data.Longitude && x.Latitude == data.Latitude && !x.deleted);
                 if(checkData != null)
                     return await Task.FromResult(PayLoad<TrafficEquipmentDTO>.CreatedFail(Status.DATATONTAI));
 
                 var mapData = _mapper.Map<TrafficEquipment>(data);
                 //mapData.CategoryCode = RanDomCode.geneActionInteGer(7);
                 //mapData.IdentificationCode = Convert.ToDouble(RanDomCode.geneActionInteGer(15));
-                _context.trafficEquipments.Add(mapData);
+                _context.trafficequipments.Add(mapData);
                 _context.SaveChanges();
 
                 return await Task.FromResult(PayLoad<TrafficEquipmentDTO>.Successfully(data));
@@ -99,7 +99,7 @@ namespace projectmap.Service
                     }
                 }
 
-                _context.trafficEquipments.Add(equipment);
+                _context.trafficequipments.Add(equipment);
                 _context.SaveChanges();
                 equipments.Add(equipment);
             }
@@ -114,15 +114,73 @@ namespace projectmap.Service
         {
             try
             {
-                var checkData = _context.trafficEquipments
+                var checkData = _context.trafficequipments
+    .Where(x => !x.deleted)
+    .AsNoTracking()
+    .Select(x => new
+    {
+        x.id,
+        x.CategoryCode,
+        x.IdentificationCode,
+        x.ManagementUnit,
+        x.JobClassification,
+        x.SignalNumber,
+        x.TypesOfSignal,
+        x.SignalInstallation,
+        x.UseStatus,
+        x.DataStatus,
+        x.Remark,
+        x.Length,
+        x.Longitude,
+        x.Latitude,
+        FirstRepair = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted)
+            .OrderBy(r => r.id)
+            .Select(r => new
+            {
+                r.RepairStatus,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault()
+            })
+            .FirstOrDefault()
+    })
+    .Select(x => new TrafficEquipmentGetAll
+    {
+        id = x.id,
+        isError = x.FirstRepair != null,
+        statusError = x.FirstRepair.RepairStatus ?? 0,
+        CategoryCode = x.CategoryCode,
+        IdentificationCode = x.IdentificationCode,
+        ManagementUnit = x.ManagementUnit,
+        JobClassification = x.JobClassification,
+        SignalNumber = x.SignalNumber,
+        TypesOfSignal = x.TypesOfSignal,
+        SignalInstallation = x.SignalInstallation,
+        UseStatus = x.UseStatus,
+        DataStatus = x.DataStatus,
+        Remark = x.Remark,
+        Length = x.Length,
+        Longitude = x.Longitude,
+        Latitude = x.Latitude,
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+    })
+    .ToList();
+                /*var checkData = _context.trafficEquipments
                      .Include(x => x.RepairDetails)
+                     .ThenInclude(r => r.RepairRecords)
+                     .ThenInclude(u => u.user)
+                     .Where(x => !x.deleted)
                      .Select(x => new
                      {
                          Equipment = x,
-                         FirstRepair = x.RepairDetails.FirstOrDefault(x1 => x1.TE_id == x.id)
+                         FirstRepair = x.RepairDetails.FirstOrDefault(x1 => x1.TE_id == x.id && !x1.deleted)
                      })
+                     .AsNoTracking()
                      .Select(x => new TrafficEquipmentGetAll
                      {
+                         id = x.Equipment.id,
                          isError = x.FirstRepair != null,
                          statusError = x.FirstRepair.RepairStatus ?? 0,
                          CategoryCode = x.Equipment.CategoryCode,
@@ -137,11 +195,63 @@ namespace projectmap.Service
                          Remark = x.Equipment.Remark,
                          Length = x.Equipment.Length,
                          Longitude = x.Equipment.Longitude,
-                         Latitude = x.Equipment.Latitude
-                     }).ToList();
+                         Latitude = x.Equipment.Latitude,
+                         account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecords.FirstOrDefault(x2 => x2.RD_id == x.FirstRepair.id).user.Name : null,
+                     }).ToList(); 
+                */
+
+                //var checkData = _context.trafficEquipments
+                //    .Select(x => new
+                //    {
+                //        Equipment = x,
+                //        FirstRepair = _context.repairDetails
+                //                              .Where(r => r.TE_id == x.id)
+                //                              .OrderBy(r => r.id)
+                //                              .Select(r => new { r.RepairStatus }) // Chỉ lấy cột cần thiết
+                //                              .FirstOrDefault()
+                //    })
+                //    .AsNoTracking() // ✅ Tăng tốc bằng cách không theo dõi trạng thái entity
+                //    .ToList()
+                //    .Select(x => new TrafficEquipmentGetAll
+                //    {
+                //        isError = x.FirstRepair != null,
+                //        statusError = x.FirstRepair?.RepairStatus ?? 0, // ✅ Tránh lỗi null
+                //        CategoryCode = x.Equipment.CategoryCode,
+                //        IdentificationCode = x.Equipment.IdentificationCode,
+                //        ManagementUnit = x.Equipment.ManagementUnit,
+                //        JobClassification = x.Equipment.JobClassification,
+                //        SignalNumber = x.Equipment.SignalNumber,
+                //        TypesOfSignal = x.Equipment.TypesOfSignal,
+                //        SignalInstallation = x.Equipment.SignalInstallation,
+                //        UseStatus = x.Equipment.UseStatus,
+                //        DataStatus = x.Equipment.DataStatus,
+                //        Remark = x.Equipment.Remark,
+                //        Length = x.Equipment.Length,
+                //        Longitude = x.Equipment.Longitude,
+                //        Latitude = x.Equipment.Latitude
+                //    }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
-                    checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+                {
+                    string[] coords = name.Trim().Split(',');
+                    if(coords.Count() == 2)
+                    {
+                        var Longitude = double.Parse(coords[0], CultureInfo.InvariantCulture);
+                        var Latitude = double.Parse(coords[1], CultureInfo.InvariantCulture);
+                        checkData = checkData.Where(x => x.Latitude == Latitude && x.Longitude == Longitude).ToList();
+                    }
+                    else if (int.TryParse(name, out int n) )
+                    {
+                        checkData = checkData.Where(x => x.CategoryCode == n).ToList();
+                    }
+                    else
+                    {
+                        checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+                    }
+
+                    
+                }
+                    
 
                 var pageList = new PageList<object>(checkData, page - 1, pageSize);
                 return await Task.FromResult(PayLoad<object>.Successfully(new
@@ -154,6 +264,101 @@ namespace projectmap.Service
                 }));
             }
             catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllTest(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var checkData = _context.trafficequipments.Where(x => !x.deleted)
+                     .ToList();
+
+                if (!string.IsNullOrEmpty(name))
+                    checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindOneId(int id)
+        {
+            try
+            {
+                    var checkData = _context.trafficequipments
+                    .Where(x => !x.deleted && x.id == id)
+                    .AsNoTracking()
+                    .Select(x => new
+                    {
+                        x.id,
+                        x.CategoryCode,
+                        x.IdentificationCode,
+                        x.ManagementUnit,
+                        x.JobClassification,
+                        x.SignalNumber,
+                        x.TypesOfSignal,
+                        x.SignalInstallation,
+                        x.UseStatus,
+                        x.DataStatus,
+                        x.Remark,
+                        x.Length,
+                        x.Longitude,
+                        x.Latitude,
+                        FirstRepair = x.RepairDetails
+                            .Where(r => r.TE_id == x.id && !r.deleted)
+                            .OrderBy(r => r.id)
+                            .Select(r => new
+                            {
+                                r.RepairStatus,
+                                RepairRecord = r.RepairRecords
+                                    .OrderBy(rr => rr.id)
+                                    .Select(rr => rr.user.Name)
+                                    .FirstOrDefault()
+                            })
+                            .FirstOrDefault()
+                    })
+                    .Select(x => new TrafficEquipmentGetAll
+                    {
+                        id = x.id,
+                        isError = x.FirstRepair != null,
+                        statusError = x.FirstRepair.RepairStatus ?? 0,
+                        CategoryCode = x.CategoryCode,
+                        IdentificationCode = x.IdentificationCode,
+                        ManagementUnit = x.ManagementUnit,
+                        JobClassification = x.JobClassification,
+                        SignalNumber = x.SignalNumber,
+                        TypesOfSignal = x.TypesOfSignal,
+                        SignalInstallation = x.SignalInstallation,
+                        UseStatus = x.UseStatus,
+                        DataStatus = x.DataStatus,
+                        Remark = x.Remark,
+                        Length = x.Length,
+                        Longitude = x.Longitude,
+                        Latitude = x.Latitude,
+                        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+                    })
+                    .FirstOrDefault(x => x.isError == false);
+
+                if(checkData == null)
+                    await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                return await Task.FromResult(PayLoad<object>.Successfully(checkData));
+            }
+                catch(Exception ex)
             {
                 return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
             }

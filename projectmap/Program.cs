@@ -44,8 +44,8 @@ var corsBuilder = new CorsPolicyBuilder();
 corsBuilder.AllowAnyHeader();
 corsBuilder.AllowAnyMethod();
 corsBuilder.AllowAnyOrigin();
-//corsBuilder.WithOrigins("http://52.184.83.97:8081"); // Đây là Url bên frontEnd
-corsBuilder.WithOrigins("http://localhost:8081"); // Đây là Url bên frontEnd
+corsBuilder.WithOrigins("http://34.80.69.96:8080"); // Đây là Url bên frontEnd
+//corsBuilder.WithOrigins("http://localhost:8080"); // Đây là Url bên frontEnd
 corsBuilder.AllowCredentials();
 builder.Services.AddCors(options =>
 {
@@ -125,21 +125,21 @@ builder.Services.AddSingleton(cloudinary);
 
 builder.Services.Configure<Cloud>(builder.Configuration.GetSection("Cloud"));
 
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-    var jobKey = new JobKey("TuDongMoiTuan");
-    q.AddJob<TuDongMoiTuan>(Otp => Otp.WithIdentity(jobKey));
-    q.AddTrigger(otps => otps.ForJob(jobKey).WithIdentity("WeeklyTrigger")
-    .StartNow()
-    .WithCronSchedule("0 0 0/1 * * ?"));
-    //.WithCronSchedule("0 0/1 * * * ?")); // "0/1" là chạy mỗi phút, để "1" là chỉ chạy 1 phút lần đầu
-});
+//builder.Services.AddQuartz(q =>
+//{
+//    q.UseMicrosoftDependencyInjectionJobFactory();
+//    var jobKey = new JobKey("TuDongMoiTuan");
+//    q.AddJob<TuDongMoiTuan>(Otp => Otp.WithIdentity(jobKey));
+//    q.AddTrigger(otps => otps.ForJob(jobKey).WithIdentity("WeeklyTrigger")
+//    .StartNow()
+//    .WithCronSchedule("0 0 0/1 * * ?"));
+//    //.WithCronSchedule("0 0/1 * * * ?")); // "0/1" là chạy mỗi phút, để "1" là chỉ chạy 1 phút lần đầu
+//});
 
 
 builder.Services.AddSwaggerGen();
 // Đăng ký HostedService cho Quartz.NET
-builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+//builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 builder.Services.AddAuthentication(); // Sử dụng phân quyền
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.Configure<Jwt>(builder.Configuration.GetSection("Jwt"));
@@ -157,7 +157,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+builder.Services.AddResponseCompression(); // ✅ Thêm dòng này
 
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 //builder.Services.AddSignalR(options =>
 //{
 //    options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // Giới hạn lưu trữ dung lượng file qua SignalR là 10MB
@@ -171,6 +173,7 @@ if (app.Environment.IsDevelopment() || true)
     app.UseSwaggerUI();
 }
 
+app.UseResponseCompression();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowSpecificOrigin");

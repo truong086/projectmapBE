@@ -7,6 +7,6 @@ namespace projectmap.Service
     {
         Task<PayLoad<RegisterDTO>> Register (RegisterDTO registerDTO);
         Task<PayLoad<ReturnLogin>> Login (RegisterDTO registerDTO);
-
+        Task<PayLoad<string>> LogOut();
     }
 }

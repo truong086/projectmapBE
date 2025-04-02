@@ -33,6 +33,20 @@ namespace projectmap.Controllers
             return await _trafficEquipmentService.FindAll(name, page, pageSize);
         }
 
+        [HttpGet]
+        [Route(nameof(FindOneId))]
+        public async Task<PayLoad<object>> FindOneId(int id)
+        {
+            return await _trafficEquipmentService.FindOneId(id);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllTest))]
+        public async Task<PayLoad<object>> FindAllTest(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllTest(name, page, pageSize);
+        }
+
         [HttpPost]
         [Route(nameof(LoadFile))]
         public async Task<PayLoad<object>> LoadFile(string path)

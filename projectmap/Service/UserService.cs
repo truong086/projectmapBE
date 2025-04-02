@@ -15,18 +15,20 @@ namespace projectmap.Service
         private readonly DBContext _context;
         private readonly IMapper _mapper;
         private Jwt _jwt;
-        public UserService(DBContext context, IOptionsMonitor<Jwt> jwt, IMapper mapper)
+        private readonly IUserTokenService _userTokenService;
+        public UserService(DBContext context, IOptionsMonitor<Jwt> jwt, IMapper mapper, IUserTokenService userTokenService)
         {
             _context = context;
             _jwt = jwt.CurrentValue;
             _mapper = mapper;
+            _userTokenService = userTokenService;
         }
         public async Task<PayLoad<ReturnLogin>> Login(RegisterDTO registerDTO)
         {
             try
             {
                 registerDTO.Password = EncryptionHelper.CreatePasswordHash(registerDTO.Password, _jwt.Key);
-                var checkData = _context.users.FirstOrDefault(x => x.Name == registerDTO.Name && x.Password == registerDTO.Password);
+                var checkData = _context.users.FirstOrDefault(x => x.Name == registerDTO.Name && x.Password == registerDTO.Password && !x.deleted);
                 if(checkData == null)
                     return await Task.FromResult(PayLoad<ReturnLogin>.CreatedFail(Status.DATATONTAI));
 
@@ -70,7 +72,7 @@ namespace projectmap.Service
         {
             try
             {
-                var checkName = _context.users.FirstOrDefault(x => x.Name == registerDTO.Name);
+                var checkName = _context.users.FirstOrDefault(x => x.Name == registerDTO.Name && !x.deleted);
                 if (checkName != null)
                     return await Task.FromResult(PayLoad<RegisterDTO>.CreatedFail(Status.DATATONTAI));
 
@@ -89,6 +91,12 @@ namespace projectmap.Service
             {
                 return await Task.FromResult(PayLoad<RegisterDTO>.CreatedFail(ex.Message));
             }
+        }
+
+        public async Task<PayLoad<string>> LogOut()
+        {
+            _userTokenService.Logout();
+            return await Task.FromResult(PayLoad<string>.Successfully(Status.SUCCESS));
         }
     }
 }

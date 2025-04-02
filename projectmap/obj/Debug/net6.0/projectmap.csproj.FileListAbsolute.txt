@@ -105,3 +105,4 @@ C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\refint\project
 C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\projectmap.pdb
 C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\projectmap.genruntimeconfig.cache
 C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\ref\projectmap.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\projectmap.sourcelink.json

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using projectmap.Common;
 using projectmap.Service;
@@ -6,6 +8,7 @@ using projectmap.ViewModel;
 
 namespace projectmap.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -16,6 +19,7 @@ namespace projectmap.Controllers
             _userService = userService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route(nameof(Register))]
         public async Task<PayLoad<RegisterDTO>> Register(RegisterDTO registerDTO)
@@ -23,11 +27,19 @@ namespace projectmap.Controllers
             return await _userService.Register(registerDTO);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route(nameof(Login))]
         public async Task<PayLoad<ReturnLogin>> Login(RegisterDTO registerDTO)
         {
             return await _userService.Login(registerDTO);
+        }
+
+        [HttpPost]
+        [Route(nameof(Logout))]
+        public async Task<PayLoad<string>> Logout()
+        {
+            return await _userService.LogOut();
         }
     }
 }

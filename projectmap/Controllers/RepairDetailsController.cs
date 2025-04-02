@@ -32,5 +32,54 @@ namespace projectmap.Controllers
         {
             return await _repairDetailsService.FindAll(name, page, pageSize);
         }
+
+        [HttpGet]
+        [Route(nameof(FindAllNoDoneByAdmin))]
+        public async Task<PayLoad<object>> FindAllNoDoneByAdmin(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _repairDetailsService.FindAllNoDoneByAdmin(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllDoneByAdmin))]
+        public async Task<PayLoad<object>> FindAllDoneByAdmin(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _repairDetailsService.FindAllDoneByAdmin(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllDoneByAccount))]
+        public async Task<PayLoad<object>> FindAllDoneByAccount(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _repairDetailsService.FindAllDoneByAccount(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllNoDoneByAccount))]
+        public async Task<PayLoad<object>> FindAllNoDoneByAccount(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _repairDetailsService.FindAllNoDoneByAccount(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindOneId))]
+        public async Task<PayLoad<object>> FindOneId(int id)
+        {
+            return await _repairDetailsService.FindOneId(id);
+        }
+
+        [HttpPut]
+        [Route(nameof(Update))]
+        public async Task<PayLoad<RepairDetailsUpdate>> Update(RepairDetailsUpdate data)
+        {
+            return await _repairDetailsService.Update(data);
+        }
+
+        [HttpPut]
+        [Route(nameof(UpdateByAccout))]
+        public async Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByAccout(RepairDetailsUpdateByAccont data)
+        {
+            return await _repairDetailsService.UpdateByAccout(data);
+        }
     }
 }

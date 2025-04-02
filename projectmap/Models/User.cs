@@ -8,7 +8,7 @@ namespace projectmap.Models
         public string? Password { get; set; }
         public int? Identity { get; set; }
         public int? UserStatus{ get; set; }
-        public virtual ICollection<RepairDetails>? RepairDetails { get; set; }
+        public virtual ICollection<RepairRecord>? RepairRecords { get; set; }
 
     }
 }

@@ -2,6 +2,7 @@
 {
     public class TrafficEquipmentGetAll
     {
+        public int id { get; set; }
         public int? CategoryCode { get; set; }
         public double? IdentificationCode { get; set; }
         public string? ManagementUnit { get; set; }
@@ -17,5 +18,6 @@
         public double? Latitude { get; set; }
         public bool? isError { get; set; }
         public int? statusError { get; set; }
+        public string? account_user { get; set; }
     }
 }

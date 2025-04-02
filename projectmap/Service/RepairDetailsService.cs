@@ -21,24 +21,40 @@ namespace projectmap.Service
         {
             try
             {
-                var checkData = _context.repairDetails.FirstOrDefault(x => x.TE_id == data.traff_id && x.RepairStatus != 3);
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.TE_id == data.traff_id && x.RepairStatus != 3 && !x.deleted);
                 if(checkData != null)
                     return await Task.FromResult(PayLoad<RepairDetailsDTO>.CreatedFail(Status.DATATONTAI));
 
-                var checkDataTraff = _context.trafficEquipments.FirstOrDefault(x => x.id == data.traff_id);
+                var checkDataTraff = _context.trafficequipments.FirstOrDefault(x => x.id == data.traff_id && !x.deleted);
                 var user = _userTokenService.name();
-                var checkAccunt = _context.users.FirstOrDefault(x => x.id == int.Parse(user));
+                var checkAccunt = _context.users.FirstOrDefault(x => x.id == int.Parse(user) && !x.deleted);
 
                 if(checkAccunt == null || checkDataTraff == null)
                     return await Task.FromResult(PayLoad<RepairDetailsDTO>.CreatedFail(Status.DATANULL));
 
                 var mapData = _mapper.Map<RepairDetails>(data);
-                mapData.MaintenanceEngineer = checkAccunt.id;
-                mapData.user = checkAccunt;
                 mapData.trafficEquipment = checkDataTraff;
                 mapData.TE_id = checkDataTraff.id;
+                mapData.cretoredit = checkAccunt.Name + " Create Data " + DateTime.UtcNow;
 
-                _context.repairDetails.Add(mapData);
+                _context.repairdetails.Add(mapData);
+                _context.SaveChanges();
+
+                var dataNew = _context.repairdetails.OrderByDescending(x => x.FaultReportingTime).FirstOrDefault();
+                if(dataNew == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsDTO>.CreatedFail(Status.DATANULL));
+
+                _context.repairrecords.Add(new RepairRecord
+                {
+                    Engineer_id = null,
+                    user = null,
+                    trafficEquipment = checkDataTraff,
+                    TE_id = checkDataTraff.id,
+                    repairDetails = dataNew,
+                    RD_id = dataNew.id,
+                    NotificationRecord = data.Remark
+                });
+
                 _context.SaveChanges();
 
                 return await Task.FromResult(PayLoad<RepairDetailsDTO>.Successfully(data));
@@ -53,22 +69,33 @@ namespace projectmap.Service
         {
             try
             {
-                var checkData = _context.repairDetails.Include(u => u.user).Include(t => t.trafficEquipment)
+                var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
+                    .Include(r => r.RepairRecords)
+                    .ThenInclude(u => u.user)
+                    .Where(x => !x.deleted)
+                    .Select(x1 => new
+                    {
+                        paird = x1,
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                    })
+                    .AsNoTracking()
                     .Select(x => new RepairDetailsGetAll
                     {
-                        lat = x.trafficEquipment.Latitude,
-                        log = x.trafficEquipment.Longitude,
-                        traff_id = x.trafficEquipment.id,
-                        ManagementUnit = x.trafficEquipment.ManagementUnit,
-                        SignalNumber = x.trafficEquipment.SignalNumber,
-                        FaultCodes = x.FaultCodes,
-                        RepairStatus = x.RepairStatus,
-                        user_id  = x.user.id,
-                        user_name = x.user.Name,
-                        Remark = x.Remark
+                        id = x.paird.id,
+                        lat = x.paird.trafficEquipment.Latitude,
+                        log = x.paird.trafficEquipment.Longitude,
+                        traff_id = x.paird.trafficEquipment.id,
+                        ManagementUnit = x.paird.trafficEquipment.ManagementUnit,
+                        SignalNumber = x.paird.trafficEquipment.SignalNumber,
+                        FaultCodes = x.paird.FaultCodes,
+                        RepairStatus = x.paird.RepairStatus,
+                        user_id = x.RepairRecordsData.user.id,
+                        user_name = x.RepairRecordsData.user.Name,
+                        identificationCode = x.paird.trafficEquipment.IdentificationCode,
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
                     }).ToList();
 
-                if(!string.IsNullOrEmpty(name))
+                if (!string.IsNullOrEmpty(name))
                     checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
 
                 var pageList = new PageList<object>(checkData, page - 1, pageSize);
@@ -85,6 +112,310 @@ namespace projectmap.Service
             catch(Exception ex)
             {
                 return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllDoneByAccount(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var use = _userTokenService.name();
+
+                var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
+                     .Include(r => r.RepairRecords)
+                     .ThenInclude(u => u.user)
+                     .Select(x1 => new
+                     {
+                         paird = x1,
+                         RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                     })
+                     .Where(x => !x.paird.deleted && x.paird.RepairStatus == 3 && x.RepairRecordsData.user.id == int.Parse(use))
+                     .AsNoTracking()
+                     .Select(x => new RepairDetailsGetAll
+                     {
+                         id = x.paird.id,
+                         lat = x.paird.trafficEquipment.Latitude,
+                         log = x.paird.trafficEquipment.Longitude,
+                         traff_id = x.paird.trafficEquipment.id,
+                         ManagementUnit = x.paird.trafficEquipment.ManagementUnit,
+                         SignalNumber = x.paird.trafficEquipment.SignalNumber,
+                         FaultCodes = x.paird.FaultCodes,
+                         RepairStatus = x.paird.RepairStatus,
+                         user_id = x.RepairRecordsData.user.id,
+                         user_name = x.RepairRecordsData.user.Name,
+                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
+                         typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                     }).ToList();
+
+                if (!string.IsNullOrEmpty(name))
+                    checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllDoneByAdmin(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
+                    .Include(r => r.RepairRecords)
+                    .ThenInclude(u => u.user)
+                    .Where(x => !x.deleted && x.RepairStatus == 3)
+                    .Select(x1 => new
+                    {
+                        paird = x1,
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                    })
+                    .AsNoTracking()
+                    .Select(x => new RepairDetailsGetAll
+                    {
+                        id = x.paird.id,
+                        lat = x.paird.trafficEquipment.Latitude,
+                        log = x.paird.trafficEquipment.Longitude,
+                        traff_id = x.paird.trafficEquipment.id,
+                        ManagementUnit = x.paird.trafficEquipment.ManagementUnit,
+                        SignalNumber = x.paird.trafficEquipment.SignalNumber,
+                        FaultCodes = x.paird.FaultCodes,
+                        RepairStatus = x.paird.RepairStatus,
+                        user_id = x.RepairRecordsData.user.id,
+                        user_name = x.RepairRecordsData.user.Name,
+                        identificationCode = x.paird.trafficEquipment.IdentificationCode,
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                    }).ToList();
+
+                if (!string.IsNullOrEmpty(name))
+                    checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllNoDoneByAccount(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var use = _userTokenService.name();
+
+                var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
+                    .Include(r => r.RepairRecords)
+                    .ThenInclude(u => u.user)
+                    .Select(x1 => new
+                    {
+                        paird = x1,
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                    })
+                    .Where(x => !x.paird.deleted && x.paird.RepairStatus != 3 && x.RepairRecordsData.user.id == int.Parse(use))
+                    .AsNoTracking()
+                    .Select(x => new RepairDetailsGetAll
+                    {
+                        id = x.paird.id,
+                        lat = x.paird.trafficEquipment.Latitude,
+                        log = x.paird.trafficEquipment.Longitude,
+                        traff_id = x.paird.trafficEquipment.id,
+                        ManagementUnit = x.paird.trafficEquipment.ManagementUnit,
+                        SignalNumber = x.paird.trafficEquipment.SignalNumber,
+                        FaultCodes = x.paird.FaultCodes,
+                        RepairStatus = x.paird.RepairStatus,
+                        user_id = x.RepairRecordsData.user.id,
+                        user_name = x.RepairRecordsData.user.Name,
+                        identificationCode = x.paird.trafficEquipment.IdentificationCode,
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                    }).ToList();
+
+                if (!string.IsNullOrEmpty(name))
+                    checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllNoDoneByAdmin(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
+                    .Include(r => r.RepairRecords)
+                    .ThenInclude(u => u.user)
+                    .Where(x => !x.deleted && x.RepairStatus != 3)
+                    .Select(x1 => new
+                    {
+                        paird = x1,
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                    })
+                    .AsNoTracking()
+                    .Select(x => new RepairDetailsGetAll
+                    {
+                        id = x.paird.id,
+                        lat = x.paird.trafficEquipment.Latitude,
+                        log = x.paird.trafficEquipment.Longitude,
+                        traff_id = x.paird.trafficEquipment.id,
+                        ManagementUnit = x.paird.trafficEquipment.ManagementUnit,
+                        SignalNumber = x.paird.trafficEquipment.SignalNumber,
+                        FaultCodes = x.paird.FaultCodes,
+                        RepairStatus = x.paird.RepairStatus,
+                        user_id = x.RepairRecordsData.user.id,
+                        user_name = x.RepairRecordsData.user.Name,
+                        identificationCode = x.paird.trafficEquipment.IdentificationCode,
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                    }).ToList();
+
+                if (!string.IsNullOrEmpty(name))
+                    checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindOneId(int id)
+        {
+            try
+            {
+                var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
+                    .Include(r => r.RepairRecords)
+                    .ThenInclude(u => u.user)
+                    .Where(x => x.id == id && !x.deleted && x.RepairStatus != 3)
+                    .Select(x1 => new
+                    {
+                       repai = x1,
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                    })
+                    .AsNoTracking()
+                    .Select(x => new RepairDetailsGetAll
+                    {
+                        id = x.repai.id,
+                        lat = x.repai.trafficEquipment.Latitude,
+                        log = x.repai.trafficEquipment.Longitude,
+                        traff_id = x.repai.trafficEquipment.id,
+                        ManagementUnit = x.repai.trafficEquipment.ManagementUnit,
+                        SignalNumber = x.repai.trafficEquipment.SignalNumber,
+                        FaultCodes = x.repai.FaultCodes,
+                        RepairStatus = x.repai.RepairStatus,
+                        user_id = x.RepairRecordsData.user.id,
+                        user_name = x.RepairRecordsData.user.Name,
+                        identificationCode = x.repai.trafficEquipment.IdentificationCode,
+                        typesOfSignal = x.repai.trafficEquipment.TypesOfSignal
+                    }).FirstOrDefault();
+                if (checkData == null)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                return await Task.FromResult(PayLoad<object>.Successfully(checkData));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<RepairDetailsUpdate>> Update(RepairDetailsUpdate data)
+        {
+            try
+            {
+                var use = _userTokenService.name();
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus == 0 && !x.deleted);
+                var checkAccount = _context.users.FirstOrDefault(x => x.id == Convert.ToInt32(use) && !x.deleted);
+                
+                if (checkData == null || checkAccount == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdate>.CreatedFail(Status.DATANULL));
+
+                var checkDataRecordRepair = _context.repairrecords.FirstOrDefault(x => x.RD_id == checkData.id);
+                if (checkDataRecordRepair == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdate>.CreatedFail(Status.DATANULL));
+
+                checkDataRecordRepair.user = checkAccount;
+                checkDataRecordRepair.Engineer_id = checkAccount.id;
+                checkData.RepairStatus = 1;
+                checkData.cretoredit = checkData.cretoredit + ", " + checkAccount.Name + " Update " + DateTime.UtcNow;
+
+                _context.repairrecords.Update(checkDataRecordRepair);
+                _context.repairdetails.Update(checkData);
+                _context.SaveChanges();
+
+                return await Task.FromResult(PayLoad<RepairDetailsUpdate>.Successfully(data));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<RepairDetailsUpdate>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByAccout(RepairDetailsUpdateByAccont data)
+        {
+            try
+            {
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus != 3 && !x.deleted);
+                if(checkData == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
+                if(data.status > 3 || data.status < 0)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
+                var checkRecordRepairDetails = _context.repairrecords.Include(u => u.user).FirstOrDefault(x => x.RD_id == checkData.id);
+                if(checkRecordRepairDetails == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
+                checkData.RepairStatus = data.status;
+                checkData.cretoredit = checkData.cretoredit + ", " + checkRecordRepairDetails.user.Name + " Update Status " + DateTime.UtcNow;
+                _context.repairdetails.Update(checkData);
+                _context.SaveChanges();
+
+                return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.Successfully(data));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(ex.Message));
             }
         }
     }
