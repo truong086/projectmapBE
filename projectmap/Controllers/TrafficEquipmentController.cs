@@ -34,6 +34,41 @@ namespace projectmap.Controllers
         }
 
         [HttpGet]
+        [Route(nameof(FindAllErrorCode0))]
+        public async Task<PayLoad<object>> FindAllErrorCode0(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllErrorCode0(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllErrorCode1))]
+        public async Task<PayLoad<object>> FindAllErrorCode1(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllErrorCode1(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllErrorCode2))]
+        public async Task<PayLoad<object>> FindAllErrorCode2(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllErrorCode2(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllErrorCode3))]
+        public async Task<PayLoad<object>> FindAllErrorCode3(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllErrorCode3(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllNoError))]
+        public async Task<PayLoad<object>> FindAllNoError(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllNoError(name, page, pageSize);
+        }
+
+        [HttpGet]
         [Route(nameof(FindOneId))]
         public async Task<PayLoad<object>> FindOneId(int id)
         {
