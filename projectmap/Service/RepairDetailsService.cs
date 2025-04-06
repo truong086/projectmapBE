@@ -92,7 +92,8 @@ namespace projectmap.Service
                         user_id = x.RepairRecordsData.user.id,
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
-                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
+                        categoryCode = x.paird.trafficEquipment.CategoryCode
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -144,7 +145,8 @@ namespace projectmap.Service
                          user_id = x.RepairRecordsData.user.id,
                          user_name = x.RepairRecordsData.user.Name,
                          identificationCode = x.paird.trafficEquipment.IdentificationCode,
-                         typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                         typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
+                         categoryCode = x.paird.trafficEquipment.CategoryCode
                      }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -194,7 +196,8 @@ namespace projectmap.Service
                         user_id = x.RepairRecordsData.user.id,
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
-                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
+                        categoryCode = x.paird.trafficEquipment.CategoryCode
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -246,7 +249,8 @@ namespace projectmap.Service
                         user_id = x.RepairRecordsData.user.id,
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
-                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
+                        categoryCode = x.paird.trafficEquipment.CategoryCode
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -296,7 +300,8 @@ namespace projectmap.Service
                         user_id = x.RepairRecordsData.user.id,
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
-                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal
+                        typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
+                        categoryCode = x.paird.trafficEquipment.CategoryCode
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -346,7 +351,9 @@ namespace projectmap.Service
                         user_id = x.RepairRecordsData.user.id,
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.repai.trafficEquipment.IdentificationCode,
-                        typesOfSignal = x.repai.trafficEquipment.TypesOfSignal
+                        typesOfSignal = x.repai.trafficEquipment.TypesOfSignal,
+                        categoryCode = x.repai.trafficEquipment.CategoryCode
+                        
                     }).FirstOrDefault();
                 if (checkData == null)
                     return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
@@ -405,6 +412,10 @@ namespace projectmap.Service
                 var checkRecordRepairDetails = _context.repairrecords.Include(u => u.user).FirstOrDefault(x => x.RD_id == checkData.id);
                 if(checkRecordRepairDetails == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
+                if (data.status == 3)
+                    checkData.FaultCodes = 0;
+                else checkData.FaultCodes = data.FaultCodes;
 
                 checkData.RepairStatus = data.status;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkRecordRepairDetails.user.Name + " Update Status " + DateTime.UtcNow;

@@ -134,7 +134,7 @@ namespace projectmap.Service
         x.Longitude,
         x.Latitude,
         FirstRepair = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus != 3)
             .OrderBy(r => r.id)
             .Select(r => new
             {

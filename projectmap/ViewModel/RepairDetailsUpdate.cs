@@ -9,5 +9,6 @@
     {
         public int id { get; set; }
         public int status { get; set; }
+        public int FaultCodes { get; set; }
     }
 }

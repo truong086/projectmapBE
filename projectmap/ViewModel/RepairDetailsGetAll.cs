@@ -4,6 +4,7 @@
     {
         public int id {  get; set; }
         public int? traff_id { get; set; }
+        public int? categoryCode { get; set; }
         public double? lat { get; set; }
         public double? log { get; set; }
         public string? ManagementUnit { get; set; }
