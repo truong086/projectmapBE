@@ -46,7 +46,7 @@ corsBuilder.AllowAnyMethod();
 corsBuilder.AllowAnyOrigin();
 //corsBuilder.WithOrigins("http://34.80.69.96:8080"); // Đây là Url bên frontEnd
 //corsBuilder.WithOrigins("http://localhost:8080"); // Đây là Url bên frontEnd
-corsBuilder.WithOrigins("https://5dc9-34-80-69-96.ngrok-free.app/"); // Đây là Url bên frontEnd
+corsBuilder.WithOrigins("https://5dc9-34-80-69-96.ngrok-free.app", "http://34.80.69.96:8080"); // Đây là Url bên frontEnd
 corsBuilder.AllowCredentials();
 builder.Services.AddCors(options =>
 {
