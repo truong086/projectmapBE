@@ -144,7 +144,9 @@ namespace projectmap.Service
                     .Select(rr => rr.user.Name)
                     .FirstOrDefault()
             })
-            .FirstOrDefault()
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture)
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -164,7 +166,8 @@ namespace projectmap.Service
         Length = x.Length,
         Longitude = x.Longitude,
         Latitude = x.Latitude,
-        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList()
     })
     .ToList();
                 /*var checkData = _context.trafficEquipments
@@ -303,7 +306,9 @@ namespace projectmap.Service
                     .Select(rr => rr.user.Name)
                     .FirstOrDefault()
             })
-            .FirstOrDefault()
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture)
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -323,7 +328,8 @@ namespace projectmap.Service
         Length = x.Length,
         Longitude = x.Longitude,
         Latitude = x.Latitude,
-        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList()
     })
     .Where(x => x.isError == true && x.statusError == 0)
     .ToList();
@@ -401,7 +407,9 @@ namespace projectmap.Service
                     .Select(rr => rr.user.Name)
                     .FirstOrDefault()
             })
-            .FirstOrDefault()
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture)
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -421,7 +429,8 @@ namespace projectmap.Service
         Length = x.Length,
         Longitude = x.Longitude,
         Latitude = x.Latitude,
-        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList()
     })
     .Where(x => x.isError == true && x.statusError == 1)
     .ToList();
@@ -499,7 +508,9 @@ namespace projectmap.Service
                     .Select(rr => rr.user.Name)
                     .FirstOrDefault()
             })
-            .FirstOrDefault()
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture)
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -519,7 +530,8 @@ namespace projectmap.Service
         Length = x.Length,
         Longitude = x.Longitude,
         Latitude = x.Latitude,
-        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList()
     })
     .Where(x => x.isError == true && x.statusError == 2)
     .ToList();
@@ -597,7 +609,9 @@ namespace projectmap.Service
                     .Select(rr => rr.user.Name)
                     .FirstOrDefault()
             })
-            .FirstOrDefault()
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture)
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -617,7 +631,8 @@ namespace projectmap.Service
         Length = x.Length,
         Longitude = x.Longitude,
         Latitude = x.Latitude,
-        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList()
     })
     .Where(x => x.isError == true && x.statusError == 3)
     .ToList();
@@ -695,7 +710,9 @@ namespace projectmap.Service
                     .Select(rr => rr.user.Name)
                     .FirstOrDefault()
             })
-            .FirstOrDefault()
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture)
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -715,7 +732,8 @@ namespace projectmap.Service
         Length = x.Length,
         Longitude = x.Longitude,
         Latitude = x.Latitude,
-        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList()
     })
     .Where(x => x.isError == false)
     .ToList();
@@ -819,7 +837,9 @@ namespace projectmap.Service
                                     .Select(rr => rr.user.Name)
                                     .FirstOrDefault()
                             })
-                            .FirstOrDefault()
+                            .FirstOrDefault(),
+                        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture)
                     })
                     .Select(x => new TrafficEquipmentGetAll
                     {
@@ -839,7 +859,8 @@ namespace projectmap.Service
                         Length = x.Length,
                         Longitude = x.Longitude,
                         Latitude = x.Latitude,
-                        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null
+                        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+                        images = x.imageData.ToList()
                     })
                     .FirstOrDefault(x => x.isError == false);
 

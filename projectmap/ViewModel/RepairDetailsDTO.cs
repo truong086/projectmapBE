@@ -9,5 +9,6 @@ namespace projectmap.ViewModel
         public int? RepairStatus { get; set; }
         public int? user_id { get; set; }
         public string? Remark { get; set; }
+        public List<IFormFile>? images { get; set; }
     }
 }

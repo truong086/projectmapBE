@@ -21,7 +21,7 @@ namespace projectmap.Controllers
 
         [HttpPost]
         [Route(nameof(Add))]
-        public async Task<PayLoad<RepairDetailsDTO>> Add (RepairDetailsDTO data)
+        public async Task<PayLoad<RepairDetailsDTO>> Add ([FromForm]RepairDetailsDTO data)
         {
             return await _repairDetailsService.Add(data);
         }

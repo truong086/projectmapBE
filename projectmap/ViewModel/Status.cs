@@ -56,5 +56,6 @@
         public static string ACCOUNTFAILD = "accounts Faild !!!";
         public static string NEW = "New";
         public static string OLD = "Old";
+        public static string REPAIRRECORD = "RepairRecord: "; 
     }
 }

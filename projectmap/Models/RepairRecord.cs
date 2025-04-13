@@ -15,5 +15,7 @@ namespace projectmap.Models
 
         public DateTimeOffset? RecordTime { get; set; } = DateTimeOffset.UtcNow;
         public string? NotificationRecord { get; set; }
+        public string? Picture { get; set; }
+        public string? PublicId { get; set; }
     }
 }

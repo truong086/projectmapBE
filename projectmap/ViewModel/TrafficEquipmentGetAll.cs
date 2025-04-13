@@ -19,5 +19,6 @@
         public bool? isError { get; set; }
         public int? statusError { get; set; }
         public string? account_user { get; set; }
+        public List<string>? images { get; set; }
     }
 }

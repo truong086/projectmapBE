@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using projectmap.Clouds;
 using projectmap.Common;
 using projectmap.Models;
 using projectmap.ViewModel;
+using System.Runtime.InteropServices;
 
 namespace projectmap.Service
 {
@@ -11,11 +14,13 @@ namespace projectmap.Service
         private readonly DBContext _context;
         private readonly IMapper _mapper;
         private readonly IUserTokenService _userTokenService;
-        public RepairDetailsService(DBContext context, IMapper mapper, IUserTokenService userTokenService)
+        private readonly Cloud _cloud;
+        public RepairDetailsService(DBContext context, IMapper mapper, IUserTokenService userTokenService, IOptions<Cloud> cloud)
         {
             _context = context;
             _mapper = mapper;
             _userTokenService = userTokenService;
+            _cloud = cloud.Value;
         }
         public async Task<PayLoad<RepairDetailsDTO>> Add(RepairDetailsDTO data)
         {
@@ -44,18 +49,47 @@ namespace projectmap.Service
                 if(dataNew == null)
                     return await Task.FromResult(PayLoad<RepairDetailsDTO>.CreatedFail(Status.DATANULL));
 
-                _context.repairrecords.Add(new RepairRecord
+                if (data.images != null && data.images.Count > 0)
                 {
-                    Engineer_id = null,
-                    user = null,
-                    trafficEquipment = checkDataTraff,
-                    TE_id = checkDataTraff.id,
-                    repairDetails = dataNew,
-                    RD_id = dataNew.id,
-                    NotificationRecord = data.Remark
-                });
+                    foreach (var image in data.images)
+                    {
+                        _context.repairrecords.Add(new RepairRecord
+                        {
+                            Engineer_id = null,
+                            user = null,
+                            trafficEquipment = checkDataTraff,
+                            TE_id = checkDataTraff.id,
+                            repairDetails = dataNew,
+                            RD_id = dataNew.id,
+                            NotificationRecord = data.Remark
+                        });
+                        _context.SaveChanges();
+                        var dataNewRecord = _context.repairrecords.OrderByDescending(x => x.id).FirstOrDefault();
+                        if (dataNewRecord != null)
+                        {
+                            uploadCloud.CloudInaryIFromAccount(image, Status.REPAIRRECORD + "" + dataNew.id.ToString(), _cloud);
+                            dataNewRecord.Picture = uploadCloud.Link;
+                            dataNewRecord.PublicId = uploadCloud.publicId;
 
-                _context.SaveChanges();
+                            _context.repairrecords.Update(dataNewRecord);
+                            _context.SaveChanges();
+                        }
+                    }
+                }
+                else
+                {
+                    _context.repairrecords.Add(new RepairRecord
+                    {
+                        Engineer_id = null,
+                        user = null,
+                        trafficEquipment = checkDataTraff,
+                        TE_id = checkDataTraff.id,
+                        repairDetails = dataNew,
+                        RD_id = dataNew.id,
+                        NotificationRecord = data.Remark
+                    });
+                    _context.SaveChanges();
+                }
 
                 return await Task.FromResult(PayLoad<RepairDetailsDTO>.Successfully(data));
             }
@@ -76,7 +110,8 @@ namespace projectmap.Service
                     .Select(x1 => new
                     {
                         paird = x1,
-                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
+                        RepairRecordsDataToList = x1.RepairRecords
                     })
                     .AsNoTracking()
                     .Select(x => new RepairDetailsGetAll
@@ -93,7 +128,8 @@ namespace projectmap.Service
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
                         typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
-                        categoryCode = x.paird.trafficEquipment.CategoryCode
+                        categoryCode = x.paird.trafficEquipment.CategoryCode,
+                        images = x.RepairRecordsDataToList.Select(x => x.Picture).ToList()
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -128,7 +164,8 @@ namespace projectmap.Service
                      .Select(x1 => new
                      {
                          paird = x1,
-                         RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                         RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
+                         RepairRecordsDataToList = x1.RepairRecords
                      })
                      .Where(x => !x.paird.deleted && x.paird.RepairStatus == 3 && x.RepairRecordsData.user.id == int.Parse(use))
                      .AsNoTracking()
@@ -146,7 +183,8 @@ namespace projectmap.Service
                          user_name = x.RepairRecordsData.user.Name,
                          identificationCode = x.paird.trafficEquipment.IdentificationCode,
                          typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
-                         categoryCode = x.paird.trafficEquipment.CategoryCode
+                         categoryCode = x.paird.trafficEquipment.CategoryCode,
+                         images = x.RepairRecordsDataToList.Select(x => x.Picture).ToList()
                      }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -180,7 +218,8 @@ namespace projectmap.Service
                     .Select(x1 => new
                     {
                         paird = x1,
-                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
+                        RepairRecordsDataToList = x1.RepairRecords
                     })
                     .AsNoTracking()
                     .Select(x => new RepairDetailsGetAll
@@ -197,7 +236,8 @@ namespace projectmap.Service
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
                         typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
-                        categoryCode = x.paird.trafficEquipment.CategoryCode
+                        categoryCode = x.paird.trafficEquipment.CategoryCode,
+                        images = x.RepairRecordsDataToList.Select(x => x.Picture).ToList()
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -232,7 +272,8 @@ namespace projectmap.Service
                     .Select(x1 => new
                     {
                         paird = x1,
-                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
+                        RepairRecordsDataToList = x1.RepairRecords
                     })
                     .Where(x => !x.paird.deleted && x.paird.RepairStatus != 3 && x.RepairRecordsData.user.id == int.Parse(use))
                     .AsNoTracking()
@@ -250,7 +291,8 @@ namespace projectmap.Service
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
                         typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
-                        categoryCode = x.paird.trafficEquipment.CategoryCode
+                        categoryCode = x.paird.trafficEquipment.CategoryCode,
+                        images = x.RepairRecordsDataToList.Select(x => x.Picture).ToList()
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -284,7 +326,8 @@ namespace projectmap.Service
                     .Select(x1 => new
                     {
                         paird = x1,
-                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
+                        RepairRecordsDataToList = x1.RepairRecords
                     })
                     .AsNoTracking()
                     .Select(x => new RepairDetailsGetAll
@@ -301,7 +344,8 @@ namespace projectmap.Service
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.paird.trafficEquipment.IdentificationCode,
                         typesOfSignal = x.paird.trafficEquipment.TypesOfSignal,
-                        categoryCode = x.paird.trafficEquipment.CategoryCode
+                        categoryCode = x.paird.trafficEquipment.CategoryCode,
+                        images = x.RepairRecordsDataToList.Select(x => x.Picture).ToList()
                     }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -335,7 +379,8 @@ namespace projectmap.Service
                     .Select(x1 => new
                     {
                        repai = x1,
-                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id)
+                        RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
+                        RepairRecordsDataToList = x1.RepairRecords
                     })
                     .AsNoTracking()
                     .Select(x => new RepairDetailsGetAll
@@ -352,8 +397,9 @@ namespace projectmap.Service
                         user_name = x.RepairRecordsData.user.Name,
                         identificationCode = x.repai.trafficEquipment.IdentificationCode,
                         typesOfSignal = x.repai.trafficEquipment.TypesOfSignal,
-                        categoryCode = x.repai.trafficEquipment.CategoryCode
-                        
+                        categoryCode = x.repai.trafficEquipment.CategoryCode,
+                        images = x.RepairRecordsDataToList.Select(x => x.Picture).ToList()
+
                     }).FirstOrDefault();
                 if (checkData == null)
                     return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));

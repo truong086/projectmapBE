@@ -15,5 +15,6 @@
         public string? user_name { get; set; }
         public double? identificationCode { get; set; }
         public string? typesOfSignal { get; set; }
+        public List<string>? images { get; set; }
     }
 }
