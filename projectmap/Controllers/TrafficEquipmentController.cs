@@ -26,6 +26,13 @@ namespace projectmap.Controllers
             return await _trafficEquipmentService.Add(trafficEquipmentDTO);
         }
 
+        [HttpPost]
+        [Route(nameof(AddTest))]
+        public async Task<PayLoad<object>> AddTest()
+        {
+            return await _trafficEquipmentService.AddTest();
+        }
+
         [HttpGet]
         [Route(nameof(FindAll))]
         public async Task<PayLoad<object>> FindAll(string? name, int page = 1, int pageSize = 20)

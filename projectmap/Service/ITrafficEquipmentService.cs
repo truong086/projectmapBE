@@ -7,6 +7,7 @@ namespace projectmap.Service
     public interface ITrafficEquipmentService
     {
         Task<PayLoad<TrafficEquipmentDTO>> Add(TrafficEquipmentDTO data);
+        Task<PayLoad<object>> AddTest();
         Task<PayLoad<object>> FindAll(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllErrorCode0(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllErrorCode1(string? name, int page = 1, int pageSize = 20);

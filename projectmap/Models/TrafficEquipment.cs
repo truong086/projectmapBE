@@ -19,6 +19,13 @@ namespace projectmap.Models
         public double? Length { get; set; }
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
+        public string? District_1 { get; set; }
+        public string? Area_Level3_1 { get; set; }
+        public string? Road_1 { get; set; }
+        public string? District_2 { get; set; }
+        public string? Area_Level3_2 { get; set; }
+        public string? Road_2 { get; set; }
+        public string? SpecialPOI { get; set; }
         public virtual ICollection<RepairDetails>? RepairDetails { get; set; }
         public virtual ICollection<RepairRecord>? RepairRecords { get; set; }
     }
