@@ -20,6 +20,7 @@
         public bool? isErrorUpdate { get; set; }
         public int? statusError { get; set; }
         public int? statusErrorUpdate { get; set; }
+        public int? statusErrorFauCode { get; set; }
         public int? totalUpdate { get; set; }
         public string? account_user { get; set; }
         public string? account_userUpdate { get; set; }

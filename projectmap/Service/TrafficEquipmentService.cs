@@ -299,6 +299,7 @@ namespace projectmap.Service
             .Select(r => new
             {
                 r.RepairStatus,
+                r.FaultCodes,
                 RepairRecord = r.RepairRecords
                     .OrderBy(rr => rr.id)
                     .Select(rr => rr.user.Name)
@@ -351,7 +352,8 @@ namespace projectmap.Service
         statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
-        road2 = x.Road_2
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes
     })
     .ToList();
                 /*var checkData = _context.trafficEquipments
@@ -487,6 +489,7 @@ namespace projectmap.Service
             .Select(r => new
             {
                 r.RepairStatus,
+                r.FaultCodes,
                 RepairRecord = r.RepairRecords
                     .OrderBy(rr => rr.id)
                     .Select(rr => rr.user.Name)
@@ -539,7 +542,8 @@ namespace projectmap.Service
         statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
-        road2 = x.Road_2
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes
     })
     .Where(x => x.isError == true && x.statusError == 0)
     .ToList();
@@ -614,6 +618,7 @@ namespace projectmap.Service
             .Select(r => new
             {
                 r.RepairStatus,
+                r.FaultCodes,
                 RepairRecord = r.RepairRecords
                     .OrderBy(rr => rr.id)
                     .Select(rr => rr.user.Name)
@@ -666,7 +671,8 @@ namespace projectmap.Service
         statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
-        road2 = x.Road_2
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes
     })
     .Where(x => x.isError == true && x.statusError == 1)
     .ToList();
@@ -741,6 +747,7 @@ namespace projectmap.Service
             .Select(r => new
             {
                 r.RepairStatus,
+                r.FaultCodes,
                 RepairRecord = r.RepairRecords
                     .OrderBy(rr => rr.id)
                     .Select(rr => rr.user.Name)
@@ -793,7 +800,8 @@ namespace projectmap.Service
         statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
-        road2 = x.Road_2
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes
     })
     .Where(x => x.isError == true && x.statusError == 2)
     .ToList();
@@ -868,6 +876,7 @@ namespace projectmap.Service
             .Select(r => new
             {
                 r.RepairStatus,
+                r.FaultCodes,
                 RepairRecord = r.RepairRecords
                     .OrderBy(rr => rr.id)
                     .Select(rr => rr.user.Name)
@@ -920,7 +929,8 @@ namespace projectmap.Service
         statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
-        road2 = x.Road_2
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes
     })
     .Where(x => x.isError == true && x.statusError == 3)
     .ToList();
@@ -995,6 +1005,7 @@ namespace projectmap.Service
             .Select(r => new
             {
                 r.RepairStatus,
+                r.FaultCodes,
                 RepairRecord = r.RepairRecords
                     .OrderBy(rr => rr.id)
                     .Select(rr => rr.user.Name)
@@ -1047,7 +1058,8 @@ namespace projectmap.Service
         statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
-        road2 = x.Road_2
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes
     })
     .Where(x => x.isError == false)
     .ToList();
@@ -1148,6 +1160,7 @@ namespace projectmap.Service
                             .Select(r => new
                             {
                                 r.RepairStatus,
+                                r.FaultCodes,
                                 RepairRecord = r.RepairRecords
                                     .OrderBy(rr => rr.id)
                                     .Select(rr => rr.user.Name)
@@ -1200,7 +1213,8 @@ namespace projectmap.Service
                         statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
                         isErrorUpdate = x.FirstRepairUpdate != null,
                         road1 = x.Road_1,
-                        road2 = x.Road_2
+                        road2 = x.Road_2,
+                        statusErrorFauCode = x.FirstRepair.FaultCodes
                     })
                     .FirstOrDefault(x => x.isError == false);
 
