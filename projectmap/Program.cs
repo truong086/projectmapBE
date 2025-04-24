@@ -158,6 +158,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserTokenService, UserTokenService>();
 builder.Services.AddScoped<ITrafficEquipmentService, TrafficEquipmentService>();
 builder.Services.AddScoped<IRepairDetailsService, RepairDetailsService>();
+builder.Services.AddScoped<INotifitionAppService, NotifitionAppService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();

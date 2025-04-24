@@ -17,7 +17,7 @@ namespace projectmap.Service
         {
             try
             {
-                var token = "";
+                var token = "d08hM0xEQ8ejXOmT-Q7eqi:APA91bFu6IeTZBvQ3mVdh-mZDxYnK-uMa2rUuHdeM65v4tzs4Y5aBfUSCaQE5wb8WZPEegOQvlEzq2ITpN1UQkmoLSu85khDOluloN93NVi1IVpRybEO5V8";
                 var messageSend = new Message
                 {
                     Token = token,
