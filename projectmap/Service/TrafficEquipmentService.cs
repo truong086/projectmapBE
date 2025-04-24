@@ -293,6 +293,7 @@ namespace projectmap.Service
         x.Latitude,
         x.Road_1,
         x.Road_2,
+        x.District_1,
         FirstRepair = x.RepairDetails
             .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus != 3)
             .OrderBy(r => r.id)
@@ -353,7 +354,8 @@ namespace projectmap.Service
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
         road2 = x.Road_2,
-        statusErrorFauCode = x.FirstRepair.FaultCodes
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1
     })
     .ToList();
                 /*var checkData = _context.trafficEquipments
@@ -483,6 +485,7 @@ namespace projectmap.Service
         x.Latitude,
         x.Road_1,
         x.Road_2,
+        x.District_1,
         FirstRepair = x.RepairDetails
             .Where(r => r.TE_id == x.id && !r.deleted)
             .OrderBy(r => r.id)
@@ -543,7 +546,8 @@ namespace projectmap.Service
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
         road2 = x.Road_2,
-        statusErrorFauCode = x.FirstRepair.FaultCodes
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1
     })
     .Where(x => x.isError == true && x.statusError == 0)
     .ToList();
@@ -612,6 +616,7 @@ namespace projectmap.Service
         x.Latitude,
         x.Road_1,
         x.Road_2,
+        x.District_1,
         FirstRepair = x.RepairDetails
             .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 1)
             .OrderBy(r => r.id)
@@ -672,7 +677,8 @@ namespace projectmap.Service
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
         road2 = x.Road_2,
-        statusErrorFauCode = x.FirstRepair.FaultCodes
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1
     })
     .Where(x => x.isError == true && x.statusError == 1)
     .ToList();
@@ -741,6 +747,7 @@ namespace projectmap.Service
         x.Latitude,
         x.Road_1,
         x.Road_2,
+        x.District_1,
         FirstRepair = x.RepairDetails
             .Where(r => r.TE_id == x.id && !r.deleted)
             .OrderBy(r => r.id)
@@ -801,7 +808,8 @@ namespace projectmap.Service
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
         road2 = x.Road_2,
-        statusErrorFauCode = x.FirstRepair.FaultCodes
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1
     })
     .Where(x => x.isError == true && x.statusError == 2)
     .ToList();
@@ -870,6 +878,7 @@ namespace projectmap.Service
         x.Latitude,
         x.Road_1,
         x.Road_2,
+        x.District_1,
         FirstRepair = x.RepairDetails
             .Where(r => r.TE_id == x.id && !r.deleted)
             .OrderBy(r => r.id)
@@ -930,7 +939,8 @@ namespace projectmap.Service
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
         road2 = x.Road_2,
-        statusErrorFauCode = x.FirstRepair.FaultCodes
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1
     })
     .Where(x => x.isError == true && x.statusError == 3)
     .ToList();
@@ -999,6 +1009,7 @@ namespace projectmap.Service
         x.Latitude,
         x.Road_1,
         x.Road_2,
+        x.District_1,
         FirstRepair = x.RepairDetails
             .Where(r => r.TE_id == x.id && !r.deleted)
             .OrderBy(r => r.id)
@@ -1059,7 +1070,8 @@ namespace projectmap.Service
         isErrorUpdate = x.FirstRepairUpdate != null,
         road1 = x.Road_1,
         road2 = x.Road_2,
-        statusErrorFauCode = x.FirstRepair.FaultCodes
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1
     })
     .Where(x => x.isError == false)
     .ToList();
@@ -1154,6 +1166,7 @@ namespace projectmap.Service
                         x.Latitude,
                         x.Road_1,
                         x.Road_2,
+                        x.District_1,
                         FirstRepair = x.RepairDetails
                             .Where(r => r.TE_id == x.id && !r.deleted)
                             .OrderBy(r => r.id)
@@ -1214,7 +1227,8 @@ namespace projectmap.Service
                         isErrorUpdate = x.FirstRepairUpdate != null,
                         road1 = x.Road_1,
                         road2 = x.Road_2,
-                        statusErrorFauCode = x.FirstRepair.FaultCodes
+                        statusErrorFauCode = x.FirstRepair.FaultCodes,
+                        districs = x.District_1
                     })
                     .FirstOrDefault(x => x.isError == false);
 

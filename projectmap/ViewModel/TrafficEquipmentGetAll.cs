@@ -26,6 +26,7 @@
         public string? account_userUpdate { get; set; }
         public string? road1 { get; set; }
         public string? road2 { get; set; }
+        public string? districs { get; set; }
         public DateTimeOffset? date { get; set; }
         public DateTimeOffset? dateUpdate { get; set; }
         public List<string>? images { get; set; }

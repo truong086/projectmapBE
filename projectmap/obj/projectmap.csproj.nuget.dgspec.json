@@ -62,6 +62,10 @@
               "target": "Package",
               "version": "[7.0.1, )"
             },
+            "FirebaseAdmin": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.2.0, )"

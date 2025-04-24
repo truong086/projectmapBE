@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using projectmap.Common;
@@ -97,6 +98,53 @@ namespace projectmap.Service
         {
             _userTokenService.Logout();
             return await Task.FromResult(PayLoad<string>.Successfully(Status.SUCCESS));
+        }
+
+        public async Task<PayLoad<object>> searchName(string? name)
+        {
+            try
+            {
+                var checkData = _context.users.Select(x => new
+                {
+                    id = x.id,
+                    name = x.Name,
+                    total = x.RepairDetails.Where(x1 => x1.RepairStatus != 3).Count()
+                }).ToList();
+
+                if (!string.IsNullOrEmpty(name))
+                    //checkData = checkData.Where(x => x.name.ToLower().Contains(name.ToLower())).ToList();
+                    checkData = checkData.Where(x => x.name.Contains(name)).ToList();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = checkData
+                }));
+            }catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> searchId(int id)
+        {
+            try
+            {
+                var checkData = _context.users.Where(x => x.id == id).AsNoTracking().Select(x => new
+                {
+                    id = x.id,
+                    name = x.Name,
+                    logandlat = x.RepairDetails.Where(x1 => x1.RepairStatus != 3).Select(x1 => new
+                    {
+                        log = x1.trafficEquipment.Longitude,
+                        lat = x1.trafficEquipment.Latitude
+                    }).ToList()
+                }).FirstOrDefault();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(checkData));
+            }catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
         }
     }
 }

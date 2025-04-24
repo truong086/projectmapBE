@@ -59,6 +59,9 @@ namespace projectmap.Migrations
                     b.Property<DateTimeOffset?>("FaultReportingTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int?>("MaintenanceEngineer")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset?>("RepairCompletionTime")
                         .HasColumnType("datetime(6)");
 
@@ -75,6 +78,8 @@ namespace projectmap.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("id");
+
+                    b.HasIndex("MaintenanceEngineer");
 
                     b.HasIndex("TE_id");
 
@@ -248,12 +253,19 @@ namespace projectmap.Migrations
 
             modelBuilder.Entity("projectmap.Models.RepairDetails", b =>
                 {
+                    b.HasOne("projectmap.Models.User", "user")
+                        .WithMany("RepairDetails")
+                        .HasForeignKey("MaintenanceEngineer")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("projectmap.Models.TrafficEquipment", "trafficEquipment")
                         .WithMany("RepairDetails")
                         .HasForeignKey("TE_id")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("trafficEquipment");
+
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("projectmap.Models.RepairRecord", b =>
@@ -295,6 +307,8 @@ namespace projectmap.Migrations
 
             modelBuilder.Entity("projectmap.Models.User", b =>
                 {
+                    b.Navigation("RepairDetails");
+
                     b.Navigation("RepairRecords");
                 });
 #pragma warning restore 612, 618

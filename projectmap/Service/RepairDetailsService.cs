@@ -33,15 +33,29 @@ namespace projectmap.Service
                 var checkDataTraff = _context.trafficequipments.FirstOrDefault(x => x.id == data.traff_id && !x.deleted);
                 var user = _userTokenService.name();
                 var checkAccunt = _context.users.FirstOrDefault(x => x.id == int.Parse(user) && !x.deleted);
+                
 
                 if(checkAccunt == null || checkDataTraff == null)
                     return await Task.FromResult(PayLoad<RepairDetailsDTO>.CreatedFail(Status.DATANULL));
 
                 var mapData = _mapper.Map<RepairDetails>(data);
+
+                if(data.user_id != 0)
+                {
+                    var checkAccountEngineer = _context.users.FirstOrDefault(x => x.id == data.user_id);
+                    if (checkAccountEngineer == null)
+                        return await Task.FromResult(PayLoad<RepairDetailsDTO>.CreatedFail(Status.DATANULL));
+
+                    mapData.user = checkAccountEngineer;
+                    mapData.MaintenanceEngineer = checkAccountEngineer.id;
+                }
+                
                 mapData.trafficEquipment = checkDataTraff;
                 mapData.TE_id = checkDataTraff.id;
                 mapData.cretoredit = checkAccunt.Name + " Create Data " + DateTime.UtcNow;
+                checkDataTraff.UseStatus = data.RepairStatus == 3 ? 1 : 2;
 
+                _context.trafficequipments.Update(checkDataTraff);
                 _context.repairdetails.Add(mapData);
                 _context.SaveChanges();
 
@@ -448,6 +462,7 @@ namespace projectmap.Service
         {
             try
             {
+                var user = _userTokenService.name();
                 var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus != 3 && !x.deleted);
                 if(checkData == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
@@ -459,12 +474,23 @@ namespace projectmap.Service
                 if(checkRecordRepairDetails == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
 
+                var checkDataTraff = _context.trafficequipments.FirstOrDefault(x => x.id == checkData.TE_id);
+                if(checkDataTraff == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
+                var checkAccountUpdateData = _context.users.FirstOrDefault(x => x.id == Convert.ToInt32(user));
+                if(checkAccountUpdateData == null || checkAccountUpdateData.id != checkData.MaintenanceEngineer)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
                 if (data.status == 3)
                     checkData.FaultCodes = 0;
                 else checkData.FaultCodes = data.FaultCodes;
 
                 checkData.RepairStatus = data.status;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkRecordRepairDetails.user.Name + " Update Status " + DateTime.UtcNow;
+                checkDataTraff.UseStatus = data.status == 3 ? 1 : 2;
+
+                _context.trafficequipments.Update(checkDataTraff);
                 _context.repairdetails.Update(checkData);
                 _context.SaveChanges();
 
@@ -473,6 +499,33 @@ namespace projectmap.Service
             catch(Exception ex)
             {
                 return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<ConfirmData>> UpdateConfimData(ConfirmData data)
+        {
+            try
+            {
+                var user = _userTokenService.name();
+                var checkAccount = _context.users.FirstOrDefault(x => x.id == int.Parse(user));
+                var checkAccountEngineer = _context.users.FirstOrDefault(x => x.id == data.id_user);
+                var checkRecordDetails = _context.repairdetails.FirstOrDefault(x => x.id == data.id);
+
+                if (checkAccount == null || checkAccountEngineer == null || checkRecordDetails == null)
+                    return await Task.FromResult(PayLoad<ConfirmData>.CreatedFail(Status.DATANULL));
+
+                checkRecordDetails.MaintenanceEngineer = checkAccountEngineer.id;
+                checkRecordDetails.user = checkAccountEngineer;
+                checkRecordDetails.cretoredit += ", " + checkAccount.Name + " Create " + DateTime.UtcNow;
+
+                _context.repairdetails.Update(checkRecordDetails);
+                _context.SaveChanges();
+
+                return await Task.FromResult(PayLoad<ConfirmData>.Successfully(data));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<ConfirmData>.CreatedFail(ex.Message));
             }
         }
     }

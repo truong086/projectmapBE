@@ -106,3 +106,14 @@ C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\projectmap.pdb
 C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\projectmap.genruntimeconfig.cache
 C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\ref\projectmap.dll
 C:\Users\ASUS\source\repos\projectmap\projectmap\obj\Debug\net6.0\projectmap.sourcelink.json
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\FirebaseAdmin.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\Google.Api.Gax.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\Google.Api.Gax.Rest.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\Google.Apis.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\Google.Apis.Auth.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\Google.Apis.Core.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\System.CodeDom.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\System.Collections.Immutable.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\System.Management.dll
+C:\Users\ASUS\source\repos\projectmap\projectmap\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Management.dll

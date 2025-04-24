@@ -22,6 +22,12 @@ namespace projectmap.Models
                 .HasForeignKey(m => m.Engineer_id)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<User>()
+                .HasMany(p => p.RepairDetails)
+                .WithOne(u => u.user)
+                .HasForeignKey(m => m.MaintenanceEngineer)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<TrafficEquipment>()
                 .HasMany(r => r.RepairDetails)
                 .WithOne(t => t.trafficEquipment)

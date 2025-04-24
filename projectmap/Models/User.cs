@@ -9,6 +9,7 @@ namespace projectmap.Models
         public int? Identity { get; set; }
         public int? UserStatus{ get; set; }
         public virtual ICollection<RepairRecord>? RepairRecords { get; set; }
+        public virtual ICollection<RepairDetails>? RepairDetails { get; set; }
 
     }
 }

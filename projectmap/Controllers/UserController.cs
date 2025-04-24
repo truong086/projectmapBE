@@ -41,5 +41,19 @@ namespace projectmap.Controllers
         {
             return await _userService.LogOut();
         }
+
+        [HttpGet]
+        [Route(nameof(searchName))]
+        public async Task<PayLoad<object>> searchName(string? name)
+        {
+            return await _userService.searchName(name);
+        }
+
+        [HttpGet]
+        [Route(nameof(searchId))]
+        public async Task<PayLoad<object>> searchId(int id)
+        {
+            return await _userService.searchId(id);
+        }
     }
 }

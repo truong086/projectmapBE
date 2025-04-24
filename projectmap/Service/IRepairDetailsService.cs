@@ -12,6 +12,7 @@ namespace projectmap.Service
         Task<PayLoad<object>> FindAllNoDoneByAccount(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<RepairDetailsDTO>> Add(RepairDetailsDTO data);
         Task<PayLoad<RepairDetailsUpdate>> Update(RepairDetailsUpdate data);
+        Task<PayLoad<ConfirmData>> UpdateConfimData(ConfirmData data);
         Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByAccout(RepairDetailsUpdateByAccont data);
         Task<PayLoad<object>> FindOneId(int id);
     }

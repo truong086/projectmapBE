@@ -5,6 +5,12 @@
         public int id { get; set; }
     }
 
+    public class ConfirmData
+    {
+        public int id { get; set; }
+        public int id_user { get; set; }
+    }
+
     public class RepairDetailsUpdateByAccont
     {
         public int id { get; set; }
