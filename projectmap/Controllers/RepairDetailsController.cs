@@ -81,5 +81,12 @@ namespace projectmap.Controllers
         {
             return await _repairDetailsService.UpdateByAccout(data);
         }
+
+        [HttpPut]
+        [Route(nameof(UpdateConfimData))]
+        public async Task<PayLoad<ConfirmData>> UpdateConfimData(ConfirmData data)
+        {
+            return await _repairDetailsService.UpdateConfimData(data);
+        }
     }
 }

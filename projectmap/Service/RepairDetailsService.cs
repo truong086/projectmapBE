@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using projectmap.Clouds;
@@ -437,16 +438,9 @@ namespace projectmap.Service
                 if (checkData == null || checkAccount == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdate>.CreatedFail(Status.DATANULL));
 
-                var checkDataRecordRepair = _context.repairrecords.FirstOrDefault(x => x.RD_id == checkData.id);
-                if (checkDataRecordRepair == null)
-                    return await Task.FromResult(PayLoad<RepairDetailsUpdate>.CreatedFail(Status.DATANULL));
-
-                checkDataRecordRepair.user = checkAccount;
-                checkDataRecordRepair.Engineer_id = checkAccount.id;
                 checkData.RepairStatus = 1;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkAccount.Name + " Update " + DateTime.UtcNow;
 
-                _context.repairrecords.Update(checkDataRecordRepair);
                 _context.repairdetails.Update(checkData);
                 _context.SaveChanges();
 
@@ -487,7 +481,7 @@ namespace projectmap.Service
                 else checkData.FaultCodes = data.FaultCodes;
 
                 checkData.RepairStatus = data.status;
-                checkData.cretoredit = checkData.cretoredit + ", " + checkRecordRepairDetails.user.Name + " Update Status " + DateTime.UtcNow;
+                checkData.cretoredit = checkData.cretoredit + ", " + checkAccountUpdateData.Name + " Update Status " + DateTime.UtcNow;
                 checkDataTraff.UseStatus = data.status == 3 ? 1 : 2;
 
                 _context.trafficequipments.Update(checkDataTraff);
@@ -514,10 +508,17 @@ namespace projectmap.Service
                 if (checkAccount == null || checkAccountEngineer == null || checkRecordDetails == null)
                     return await Task.FromResult(PayLoad<ConfirmData>.CreatedFail(Status.DATANULL));
 
+                var checkDataRecordRepair = _context.repairrecords.FirstOrDefault(x => x.RD_id == checkRecordDetails.id);
+                if (checkDataRecordRepair == null)
+                    return await Task.FromResult(PayLoad<ConfirmData>.CreatedFail(Status.DATANULL));
+
+                checkDataRecordRepair.user = checkAccountEngineer;
+                checkDataRecordRepair.Engineer_id = checkAccountEngineer.id;
                 checkRecordDetails.MaintenanceEngineer = checkAccountEngineer.id;
                 checkRecordDetails.user = checkAccountEngineer;
                 checkRecordDetails.cretoredit += ", " + checkAccount.Name + " Create " + DateTime.UtcNow;
 
+                _context.repairrecords.Update(checkDataRecordRepair);
                 _context.repairdetails.Update(checkRecordDetails);
                 _context.SaveChanges();
 
