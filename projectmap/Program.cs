@@ -59,8 +59,8 @@ builder.Services.AddCors(options =>
 
 FirebaseApp.Create(new AppOptions()
 {
-    //Credential = GoogleCredential.FromFile("/home/tsustedu2025_ADMIN/BackEndManagerWarehouseUpdate/quanlykhoupdate/notification-bdf14-firebase-adminsdk-fbsvc-87b7743b04.json")
-    Credential = GoogleCredential.FromFile("C:\\Users\\ASUS\\OneDrive\\Desktop\\VueJs\\SpringBoot\\GoogleMap\\trafficsmms-firebase-adminsdk-fbsvc-fd40bd48b2.json")
+    Credential = GoogleCredential.FromFile("/home/truong0806s/projectmapBE/projectmap/trafficsmms-firebase-adminsdk-fbsvc-fd40bd48b2.json")
+    //Credential = GoogleCredential.FromFile("C:\\Users\\ASUS\\OneDrive\\Desktop\\VueJs\\SpringBoot\\GoogleMap\\trafficsmms-firebase-adminsdk-fbsvc-fd40bd48b2.json")
     //Credential = GoogleCredential.FromFile("/Users/macbook/Downloads/notification-bdf14-firebase-adminsdk-fbsvc-85559dcd12.json")
 
 });
