@@ -212,5 +212,31 @@ namespace projectmap.Service
 
             return dateTimeInterval;
         }
+
+        public async Task<PayLoad<string>> AddToken(string token)
+        {
+            try
+            {
+                var user = _userTokenService.name();
+                var checkAccount = _context.users.FirstOrDefault(x => x.id == Convert.ToInt32(user));
+                if(checkAccount == null)
+                    return await Task.FromResult(PayLoad<string>.CreatedFail(Status.DATANULL));
+
+                if (checkAccount.Token == token)
+                    return await Task.FromResult(PayLoad<string>.Successfully(Status.SUCCESS));
+
+                checkAccount.Token = token;
+                _context.users.Update(checkAccount);
+                _context.SaveChanges();
+
+
+                return await Task.FromResult(PayLoad<string>.Successfully(Status.SUCCESS));
+
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<string>.CreatedFail(ex.Message));
+            }
+        }
     }
 }

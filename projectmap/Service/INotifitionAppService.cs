@@ -4,6 +4,6 @@ namespace projectmap.Service
 {
     public interface INotifitionAppService
     {
-        Task<PayLoad<string>> notifi();
+        Task<PayLoad<string>> notifi(string token);
     }
 }

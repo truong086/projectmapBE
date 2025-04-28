@@ -13,11 +13,10 @@ namespace projectmap.Service
             _context = context;
         }
 
-        public async Task<PayLoad<string>> notifi()
+        public async Task<PayLoad<string>> notifi(string token)
         {
             try
             {
-                var token = "d08hM0xEQ8ejXOmT-Q7eqi:APA91bFu6IeTZBvQ3mVdh-mZDxYnK-uMa2rUuHdeM65v4tzs4Y5aBfUSCaQE5wb8WZPEegOQvlEzq2ITpN1UQkmoLSu85khDOluloN93NVi1IVpRybEO5V8";
                 var messageSend = new Message
                 {
                     Token = token,

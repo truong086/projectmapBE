@@ -15,13 +15,15 @@ namespace projectmap.Service
         private readonly DBContext _context;
         private readonly IMapper _mapper;
         private readonly IUserTokenService _userTokenService;
+        private readonly INotifitionAppService _notifitionAppService;
         private readonly Cloud _cloud;
-        public RepairDetailsService(DBContext context, IMapper mapper, IUserTokenService userTokenService, IOptions<Cloud> cloud)
+        public RepairDetailsService(DBContext context, IMapper mapper, IUserTokenService userTokenService, IOptions<Cloud> cloud, INotifitionAppService notifitionAppService)
         {
             _context = context;
             _mapper = mapper;
             _userTokenService = userTokenService;
             _cloud = cloud.Value;
+            _notifitionAppService = notifitionAppService;
         }
         public async Task<PayLoad<RepairDetailsDTO>> Add(RepairDetailsDTO data)
         {
@@ -432,13 +434,13 @@ namespace projectmap.Service
             try
             {
                 var use = _userTokenService.name();
-                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus == 1 && !x.deleted);
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus == 0 && !x.deleted);
                 var checkAccount = _context.users.FirstOrDefault(x => x.id == Convert.ToInt32(use) && !x.deleted);
                 
                 if (checkData == null || checkAccount == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdate>.CreatedFail(Status.DATANULL));
 
-                checkData.RepairStatus = 2;
+                checkData.RepairStatus = 1;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkAccount.Name + " Update " + DateTime.UtcNow;
 
                 _context.repairdetails.Update(checkData);
@@ -567,6 +569,7 @@ namespace projectmap.Service
                 _context.repairdetails.Update(checkRecordDetails);
                 _context.SaveChanges();
 
+                var dataSen = _notifitionAppService.notifi(checkAccountEngineer.Token == null || checkAccountEngineer.Token  == "" ? "" : checkAccountEngineer.Token);
                 return await Task.FromResult(PayLoad<ConfirmData>.Successfully(data));
             }
             catch(Exception ex)

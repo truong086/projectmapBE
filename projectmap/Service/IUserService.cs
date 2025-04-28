@@ -11,5 +11,6 @@ namespace projectmap.Service
         Task<PayLoad<ReturnLogin>> Login (RegisterDTO registerDTO);
         Task<PayLoad<string>> LogOut();
         Task<PayLoad<object>> CheckToken(string token);
+        Task<PayLoad<string>> AddToken(string token);
     }
 }

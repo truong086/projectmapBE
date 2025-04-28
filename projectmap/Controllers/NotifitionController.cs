@@ -17,9 +17,9 @@ namespace projectmap.Controllers
 
         [HttpPost]
         [Route(nameof(notifi))]
-        public async Task<PayLoad<string>> notifi()
+        public async Task<PayLoad<string>> notifi(string token)
         {
-            return await _notifitionAppService.notifi();
+            return await _notifitionAppService.notifi(token);
         }
             
     }
