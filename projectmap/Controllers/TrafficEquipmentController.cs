@@ -41,6 +41,13 @@ namespace projectmap.Controllers
         }
 
         [HttpGet]
+        [Route(nameof(FindAllErrorCode0ByAccount))]
+        public async Task<PayLoad<object>> FindAllErrorCode0ByAccount(int id, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllErrorCode0ByAccount(id, page, pageSize);
+        }
+
+        [HttpGet]
         [Route(nameof(FindAllErrorCode0))]
         public async Task<PayLoad<object>> FindAllErrorCode0(string? name, int page = 1, int pageSize = 20)
         {
@@ -66,6 +73,13 @@ namespace projectmap.Controllers
         public async Task<PayLoad<object>> FindAllErrorCode3(string? name, int page = 1, int pageSize = 20)
         {
             return await _trafficEquipmentService.FindAllErrorCode3(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(FindAllErrorCode321))]
+        public async Task<PayLoad<object>> FindAllErrorCode321(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllErrorCode321(name, page, pageSize);
         }
 
         [HttpGet]

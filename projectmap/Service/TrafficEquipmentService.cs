@@ -7,6 +7,7 @@ using projectmap.Models;
 using projectmap.ViewModel;
 using System.Globalization;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace projectmap.Service
 {
@@ -309,7 +310,7 @@ namespace projectmap.Service
             })
             .FirstOrDefault(),
         FirstRepairUpdate = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
             .OrderByDescending(r => r.FaultReportingTime)
             .Select(r => new
             {
@@ -324,7 +325,7 @@ namespace projectmap.Service
         imageData = x.RepairDetails
         .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
         totalEdit = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3).Count()
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -491,6 +492,7 @@ namespace projectmap.Service
             .OrderBy(r => r.id)
             .Select(r => new
             {
+                r.id,
                 r.RepairStatus,
                 r.FaultCodes,
                 RepairRecord = r.RepairRecords
@@ -501,7 +503,7 @@ namespace projectmap.Service
             })
             .FirstOrDefault(),
         FirstRepairUpdate = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
             .OrderByDescending(r => r.FaultReportingTime)
             .Select(r => new
             {
@@ -516,7 +518,7 @@ namespace projectmap.Service
         imageData = x.RepairDetails
         .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
         totalEdit = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3).Count()
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -547,9 +549,10 @@ namespace projectmap.Service
         road1 = x.Road_1,
         road2 = x.Road_2,
         statusErrorFauCode = x.FirstRepair.FaultCodes,
-        districs = x.District_1
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
     })
-    .Where(x => x.isError == true && x.statusError == 0)
+    .Where(x => x.isError == true && x.statusError == 1)
     .ToList();
               
 
@@ -618,10 +621,11 @@ namespace projectmap.Service
         x.Road_2,
         x.District_1,
         FirstRepair = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 1)
+            .Where(r => r.TE_id == x.id && !r.deleted)
             .OrderBy(r => r.id)
             .Select(r => new
             {
+                r.id,
                 r.RepairStatus,
                 r.FaultCodes,
                 RepairRecord = r.RepairRecords
@@ -632,7 +636,7 @@ namespace projectmap.Service
             })
             .FirstOrDefault(),
         FirstRepairUpdate = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
             .OrderByDescending(r => r.FaultReportingTime)
             .Select(r => new
             {
@@ -647,7 +651,7 @@ namespace projectmap.Service
         imageData = x.RepairDetails
         .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
         totalEdit = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3).Count()
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -678,9 +682,10 @@ namespace projectmap.Service
         road1 = x.Road_1,
         road2 = x.Road_2,
         statusErrorFauCode = x.FirstRepair.FaultCodes,
-        districs = x.District_1
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
     })
-    .Where(x => x.isError == true && x.statusError == 1)
+    .Where(x => x.isError == true && x.statusError == 2)
     .ToList();
 
 
@@ -753,6 +758,7 @@ namespace projectmap.Service
             .OrderBy(r => r.id)
             .Select(r => new
             {
+                r.id,
                 r.RepairStatus,
                 r.FaultCodes,
                 RepairRecord = r.RepairRecords
@@ -763,7 +769,7 @@ namespace projectmap.Service
             })
             .FirstOrDefault(),
         FirstRepairUpdate = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
             .OrderByDescending(r => r.FaultReportingTime)
             .Select(r => new
             {
@@ -778,7 +784,7 @@ namespace projectmap.Service
         imageData = x.RepairDetails
         .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
         totalEdit = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3).Count()
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -809,9 +815,10 @@ namespace projectmap.Service
         road1 = x.Road_1,
         road2 = x.Road_2,
         statusErrorFauCode = x.FirstRepair.FaultCodes,
-        districs = x.District_1
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
     })
-    .Where(x => x.isError == true && x.statusError == 2)
+    .Where(x => x.isError == true && x.statusError == 3)
     .ToList();
 
 
@@ -884,6 +891,7 @@ namespace projectmap.Service
             .OrderBy(r => r.id)
             .Select(r => new
             {
+                r.id,
                 r.RepairStatus,
                 r.FaultCodes,
                 RepairRecord = r.RepairRecords
@@ -894,7 +902,7 @@ namespace projectmap.Service
             })
             .FirstOrDefault(),
         FirstRepairUpdate = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
             .OrderByDescending(r => r.FaultReportingTime)
             .Select(r => new
             {
@@ -909,7 +917,7 @@ namespace projectmap.Service
         imageData = x.RepairDetails
         .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
         totalEdit = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3).Count()
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -940,9 +948,10 @@ namespace projectmap.Service
         road1 = x.Road_1,
         road2 = x.Road_2,
         statusErrorFauCode = x.FirstRepair.FaultCodes,
-        districs = x.District_1
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
     })
-    .Where(x => x.isError == true && x.statusError == 3)
+    .Where(x => x.isError == true && x.statusError == 4)
     .ToList();
 
 
@@ -1015,6 +1024,7 @@ namespace projectmap.Service
             .OrderBy(r => r.id)
             .Select(r => new
             {
+                r.id,
                 r.RepairStatus,
                 r.FaultCodes,
                 RepairRecord = r.RepairRecords
@@ -1025,7 +1035,7 @@ namespace projectmap.Service
             })
             .FirstOrDefault(),
         FirstRepairUpdate = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
             .OrderByDescending(r => r.FaultReportingTime)
             .Select(r => new
             {
@@ -1040,7 +1050,7 @@ namespace projectmap.Service
         imageData = x.RepairDetails
         .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
         totalEdit = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3).Count()
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
     })
     .Select(x => new TrafficEquipmentGetAll
     {
@@ -1071,7 +1081,8 @@ namespace projectmap.Service
         road1 = x.Road_1,
         road2 = x.Road_2,
         statusErrorFauCode = x.FirstRepair.FaultCodes,
-        districs = x.District_1
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
     })
     .Where(x => x.isError == false)
     .ToList();
@@ -1172,6 +1183,7 @@ namespace projectmap.Service
                             .OrderBy(r => r.id)
                             .Select(r => new
                             {
+                                r.id,
                                 r.RepairStatus,
                                 r.FaultCodes,
                                 RepairRecord = r.RepairRecords
@@ -1182,7 +1194,7 @@ namespace projectmap.Service
                             })
                             .FirstOrDefault(),
                         FirstRepairUpdate = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3)
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
             .OrderByDescending(r => r.FaultReportingTime)
             .Select(r => new
             {
@@ -1197,7 +1209,7 @@ namespace projectmap.Service
                         imageData = x.RepairDetails
         .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
                         totalEdit = x.RepairDetails
-            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 3).Count()
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
                     })
                     .Select(x => new TrafficEquipmentGetAll
                     {
@@ -1228,9 +1240,10 @@ namespace projectmap.Service
                         road1 = x.Road_1,
                         road2 = x.Road_2,
                         statusErrorFauCode = x.FirstRepair.FaultCodes,
-                        districs = x.District_1
+                        districs = x.District_1,
+                        repaiDetail_id = x.FirstRepair.id
                     })
-                    .FirstOrDefault(x => x.isError == false);
+                    .FirstOrDefault(x => x.isError == false || (x.isError == true && x.statusError == 4));
 
                 if(checkData == null)
                     await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
@@ -1238,6 +1251,254 @@ namespace projectmap.Service
                 return await Task.FromResult(PayLoad<object>.Successfully(checkData));
             }
                 catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllErrorCode0ByAccount(int id, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var checkData = _context.trafficequipments
+    .Where(x => !x.deleted)
+    .AsNoTracking()
+    .Select(x => new
+    {
+        x.id,
+        x.CategoryCode,
+        x.IdentificationCode,
+        x.ManagementUnit,
+        x.JobClassification,
+        x.SignalNumber,
+        x.TypesOfSignal,
+        x.SignalInstallation,
+        x.UseStatus,
+        x.DataStatus,
+        x.Remark,
+        x.Length,
+        x.Longitude,
+        x.Latitude,
+        x.Road_1,
+        x.Road_2,
+        x.District_1,
+        FirstRepair = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted)
+            .OrderBy(r => r.id)
+            .Select(r => new
+            {
+                r.id,
+                r.RepairStatus,
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => new
+                    {
+                        rr.user.Name,
+                        rr.user.id
+                    })
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        FirstRepairUpdate = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
+            .OrderByDescending(r => r.FaultReportingTime)
+            .Select(r => new
+            {
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
+        totalEdit = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
+    })
+    .Select(x => new TrafficEquipmentGetAll
+    {
+        id = x.id,
+        id_Engineer = x.FirstRepair.RepairRecord.id,
+        isError = x.FirstRepair != null,
+        statusError = x.FirstRepair.RepairStatus ?? 0,
+        CategoryCode = x.CategoryCode,
+        IdentificationCode = x.IdentificationCode,
+        ManagementUnit = x.ManagementUnit,
+        JobClassification = x.JobClassification,
+        SignalNumber = x.SignalNumber,
+        TypesOfSignal = x.TypesOfSignal,
+        SignalInstallation = x.SignalInstallation,
+        UseStatus = x.UseStatus,
+        DataStatus = x.DataStatus,
+        Remark = x.Remark,
+        Length = x.Length,
+        Longitude = x.Longitude,
+        Latitude = x.Latitude,
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord.Name : null,
+        images = x.imageData.ToList(),
+        totalUpdate = x.totalEdit,
+        date = x.FirstRepair.date,
+        dateUpdate = x.FirstRepairUpdate.date,
+        account_userUpdate = x.FirstRepairUpdate.RepairRecord,
+        statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
+        isErrorUpdate = x.FirstRepairUpdate != null,
+        road1 = x.Road_1,
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
+    })
+    .Where(x => x.isError == true && x.statusError != 4 && x.id_Engineer == id)
+                .ToList();
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllErrorCode321(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var checkData = _context.trafficequipments
+    .Where(x => !x.deleted)
+    .AsNoTracking()
+    .Select(x => new
+    {
+        x.id,
+        x.CategoryCode,
+        x.IdentificationCode,
+        x.ManagementUnit,
+        x.JobClassification,
+        x.SignalNumber,
+        x.TypesOfSignal,
+        x.SignalInstallation,
+        x.UseStatus,
+        x.DataStatus,
+        x.Remark,
+        x.Length,
+        x.Longitude,
+        x.Latitude,
+        x.Road_1,
+        x.Road_2,
+        x.District_1,
+        FirstRepair = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted)
+            .OrderBy(r => r.id)
+            .Select(r => new
+            {
+                r.id,
+                r.RepairStatus,
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        FirstRepairUpdate = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
+            .OrderByDescending(r => r.FaultReportingTime)
+            .Select(r => new
+            {
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
+        totalEdit = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
+    })
+    .Select(x => new TrafficEquipmentGetAll
+    {
+        id = x.id,
+        isError = x.FirstRepair != null,
+        statusError = x.FirstRepair.RepairStatus ?? 0,
+        CategoryCode = x.CategoryCode,
+        IdentificationCode = x.IdentificationCode,
+        ManagementUnit = x.ManagementUnit,
+        JobClassification = x.JobClassification,
+        SignalNumber = x.SignalNumber,
+        TypesOfSignal = x.TypesOfSignal,
+        SignalInstallation = x.SignalInstallation,
+        UseStatus = x.UseStatus,
+        DataStatus = x.DataStatus,
+        Remark = x.Remark,
+        Length = x.Length,
+        Longitude = x.Longitude,
+        Latitude = x.Latitude,
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList(),
+        totalUpdate = x.totalEdit,
+        date = x.FirstRepair.date,
+        dateUpdate = x.FirstRepairUpdate.date,
+        account_userUpdate = x.FirstRepairUpdate.RepairRecord,
+        statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
+        isErrorUpdate = x.FirstRepairUpdate != null,
+        road1 = x.Road_1,
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
+    })
+    .Where(x => x.isError == true && (x.statusError == 3 || x.statusError == 2 || x.statusError == 1))
+    .ToList();
+
+
+                if (!string.IsNullOrEmpty(name))
+                {
+                    string[] coords = name.Trim().Split(',');
+                    if (coords.Count() == 2)
+                    {
+                        var Longitude = double.Parse(coords[0], CultureInfo.InvariantCulture);
+                        var Latitude = double.Parse(coords[1], CultureInfo.InvariantCulture);
+                        checkData = checkData.Where(x => x.Latitude == Latitude && x.Longitude == Longitude).ToList();
+                    }
+                    else if (int.TryParse(name, out int n))
+                    {
+                        checkData = checkData.Where(x => x.CategoryCode == n).ToList();
+                    }
+                    else
+                    {
+                        checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+                    }
+
+
+                }
+
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
             {
                 return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
             }

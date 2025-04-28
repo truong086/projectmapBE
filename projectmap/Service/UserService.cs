@@ -108,7 +108,7 @@ namespace projectmap.Service
                 {
                     id = x.id,
                     name = x.Name,
-                    total = x.RepairDetails.Where(x1 => x1.RepairStatus != 3).Count()
+                    total = x.RepairDetails.Where(x1 => x1.RepairStatus != 4 && x1.RepairStatus != 5).Select(x2 => x2.RepairRecords).Count()
                 }).ToList();
 
                 if (!string.IsNullOrEmpty(name))
@@ -133,7 +133,7 @@ namespace projectmap.Service
                 {
                     id = x.id,
                     name = x.Name,
-                    logandlat = x.RepairDetails.Where(x1 => x1.RepairStatus != 3).Select(x1 => new
+                    logandlat = x.RepairDetails.Where(x1 => x1.RepairStatus != 4 && x1.RepairStatus != 5).Select(x1 => new
                     {
                         log = x1.trafficEquipment.Longitude,
                         lat = x1.trafficEquipment.Latitude
@@ -145,6 +145,72 @@ namespace projectmap.Service
             {
                 return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
             }
+        }
+
+        public async Task<PayLoad<object>> CheckToken(string token)
+        {
+            try
+            {
+                var user = _userTokenService.name();
+                var checkAccount = _context.users.Where(x => x.id == Convert.ToInt32(user) && !x.deleted).FirstOrDefault();
+                if (checkAccount == null)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                var jwtTokenHandler = new JwtSecurityTokenHandler();
+                var secretKeyBytes = Encoding.UTF8.GetBytes(_jwt.Key); // Lấy mảng byte
+                var Tokenparam = new TokenValidationParameters
+                {
+                    // Tự cấp token
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+
+                    // Ký vào token
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes), // Thuật toán mã hóa token
+
+                    ClockSkew = TimeSpan.Zero,
+
+                    ValidateLifetime = false // Không kiểm tra token hết hạn
+                };
+
+                var tokenInverification = jwtTokenHandler.ValidateToken(token, Tokenparam, out var validatedToken);
+
+                var utcExpireDate = long.Parse(tokenInverification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+
+                var expireDate = ConverunixTimeToDateTime(utcExpireDate);
+                if (expireDate > DateTime.UtcNow)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(Status.IDAUTHENTICATION, checkAccount.id.ToString())
+                    };
+
+                    return await Task.FromResult(PayLoad<object>.Successfully(new
+                    {
+                        token = GenerateToken(claims)
+                    }));
+                }
+
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    token = token
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        private DateTime ConverunixTimeToDateTime(long utcExpireDate)
+        {
+            // Tính thời gian từ năm: 1970
+            var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+            dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
+
+            return dateTimeInterval;
         }
     }
 }

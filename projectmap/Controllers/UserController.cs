@@ -55,5 +55,13 @@ namespace projectmap.Controllers
         {
             return await _userService.searchId(id);
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route(nameof(CheckToken))]
+        public async Task<PayLoad<object>> CheckToken(string token)
+        {
+            return await _userService.CheckToken(token);
+        }
     }
 }

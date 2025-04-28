@@ -3,6 +3,7 @@
     public class TrafficEquipmentGetAll
     {
         public int id { get; set; }
+        public int id_Engineer { get; set; }
         public int? CategoryCode { get; set; }
         public double? IdentificationCode { get; set; }
         public string? ManagementUnit { get; set; }
@@ -22,6 +23,7 @@
         public int? statusErrorUpdate { get; set; }
         public int? statusErrorFauCode { get; set; }
         public int? totalUpdate { get; set; }
+        public int? repaiDetail_id { get; set; }
         public string? account_user { get; set; }
         public string? account_userUpdate { get; set; }
         public string? road1 { get; set; }

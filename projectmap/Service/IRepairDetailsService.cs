@@ -14,6 +14,8 @@ namespace projectmap.Service
         Task<PayLoad<RepairDetailsUpdate>> Update(RepairDetailsUpdate data);
         Task<PayLoad<ConfirmData>> UpdateConfimData(ConfirmData data);
         Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByAccout(RepairDetailsUpdateByAccont data);
+        Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByClose(RepairDetailsUpdateByAccont data);
+        Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByOffClose(RepairDetailsUpdateByAccont data);
         Task<PayLoad<object>> FindOneId(int id);
     }
 }

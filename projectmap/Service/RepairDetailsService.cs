@@ -27,7 +27,7 @@ namespace projectmap.Service
         {
             try
             {
-                var checkData = _context.repairdetails.FirstOrDefault(x => x.TE_id == data.traff_id && x.RepairStatus != 3 && !x.deleted);
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.TE_id == data.traff_id && x.RepairStatus != 4 && !x.deleted);
                 if(checkData != null)
                     return await Task.FromResult(PayLoad<RepairDetailsDTO>.CreatedFail(Status.DATATONTAI));
 
@@ -54,7 +54,7 @@ namespace projectmap.Service
                 mapData.trafficEquipment = checkDataTraff;
                 mapData.TE_id = checkDataTraff.id;
                 mapData.cretoredit = checkAccunt.Name + " Create Data " + DateTime.UtcNow;
-                checkDataTraff.UseStatus = data.RepairStatus == 3 ? 1 : 2;
+                checkDataTraff.UseStatus = data.RepairStatus == 4 ? 1 : 2;
 
                 _context.trafficequipments.Update(checkDataTraff);
                 _context.repairdetails.Add(mapData);
@@ -182,7 +182,7 @@ namespace projectmap.Service
                          RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
                          RepairRecordsDataToList = x1.RepairRecords
                      })
-                     .Where(x => !x.paird.deleted && x.paird.RepairStatus == 3 && x.RepairRecordsData.user.id == int.Parse(use))
+                     .Where(x => !x.paird.deleted && x.paird.RepairStatus == 4 && x.RepairRecordsData.user.id == int.Parse(use))
                      .AsNoTracking()
                      .Select(x => new RepairDetailsGetAll
                      {
@@ -229,7 +229,7 @@ namespace projectmap.Service
                 var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
                     .Include(r => r.RepairRecords)
                     .ThenInclude(u => u.user)
-                    .Where(x => !x.deleted && x.RepairStatus == 3)
+                    .Where(x => !x.deleted && x.RepairStatus == 4)
                     .Select(x1 => new
                     {
                         paird = x1,
@@ -290,7 +290,7 @@ namespace projectmap.Service
                         RepairRecordsData = x1.RepairRecords.FirstOrDefault(x => x.RD_id == x1.id),
                         RepairRecordsDataToList = x1.RepairRecords
                     })
-                    .Where(x => !x.paird.deleted && x.paird.RepairStatus != 3 && x.RepairRecordsData.user.id == int.Parse(use))
+                    .Where(x => !x.paird.deleted && x.paird.RepairStatus != 4 && x.RepairRecordsData.user.id == int.Parse(use))
                     .AsNoTracking()
                     .Select(x => new RepairDetailsGetAll
                     {
@@ -337,7 +337,7 @@ namespace projectmap.Service
                 var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
                     .Include(r => r.RepairRecords)
                     .ThenInclude(u => u.user)
-                    .Where(x => !x.deleted && x.RepairStatus != 3)
+                    .Where(x => !x.deleted && x.RepairStatus != 4)
                     .Select(x1 => new
                     {
                         paird = x1,
@@ -390,7 +390,7 @@ namespace projectmap.Service
                 var checkData = _context.repairdetails.Include(t => t.trafficEquipment)
                     .Include(r => r.RepairRecords)
                     .ThenInclude(u => u.user)
-                    .Where(x => x.id == id && !x.deleted && x.RepairStatus != 3)
+                    .Where(x => x.id == id && !x.deleted && x.RepairStatus != 4)
                     .Select(x1 => new
                     {
                        repai = x1,
@@ -432,13 +432,13 @@ namespace projectmap.Service
             try
             {
                 var use = _userTokenService.name();
-                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus == 0 && !x.deleted);
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus == 1 && !x.deleted);
                 var checkAccount = _context.users.FirstOrDefault(x => x.id == Convert.ToInt32(use) && !x.deleted);
                 
                 if (checkData == null || checkAccount == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdate>.CreatedFail(Status.DATANULL));
 
-                checkData.RepairStatus = 1;
+                checkData.RepairStatus = 2;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkAccount.Name + " Update " + DateTime.UtcNow;
 
                 _context.repairdetails.Update(checkData);
@@ -457,7 +457,7 @@ namespace projectmap.Service
             try
             {
                 var user = _userTokenService.name();
-                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus != 3 && !x.deleted);
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id && x.RepairStatus != 4 && !x.deleted);
                 if(checkData == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
 
@@ -476,15 +476,59 @@ namespace projectmap.Service
                 if(checkAccountUpdateData == null || checkAccountUpdateData.id != checkData.MaintenanceEngineer)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
 
-                if (data.status == 3)
+                if (data.status == 4)
                     checkData.FaultCodes = 0;
                 else checkData.FaultCodes = data.FaultCodes;
 
                 checkData.RepairStatus = data.status;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkAccountUpdateData.Name + " Update Status " + DateTime.UtcNow;
-                checkDataTraff.UseStatus = data.status == 3 ? 1 : 2;
+                checkDataTraff.UseStatus = data.status == 4 ? 1 : 2;
 
                 _context.trafficequipments.Update(checkDataTraff);
+                _context.repairdetails.Update(checkData);
+                _context.SaveChanges();
+
+                return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.Successfully(data));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByClose(RepairDetailsUpdateByAccont data)
+        {
+            try
+            {
+                var checkId = _context.repairdetails.FirstOrDefault(x => x.id == data.id);
+                if(checkId == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
+                checkId.RepairStatus = data.status;
+
+                _context.repairdetails.Update(checkId);
+                _context.SaveChanges();
+
+                return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.Successfully(data));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<RepairDetailsUpdateByAccont>> UpdateByOffClose(RepairDetailsUpdateByAccont data)
+        {
+            try
+            {
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id);
+                if(checkData == null)
+                    return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
+
+                if (checkData.MaintenanceEngineer == null)
+                    checkData.RepairStatus = 1;
+                else checkData.RepairStatus = 2;
+
                 _context.repairdetails.Update(checkData);
                 _context.SaveChanges();
 
@@ -516,6 +560,7 @@ namespace projectmap.Service
                 checkDataRecordRepair.Engineer_id = checkAccountEngineer.id;
                 checkRecordDetails.MaintenanceEngineer = checkAccountEngineer.id;
                 checkRecordDetails.user = checkAccountEngineer;
+                checkRecordDetails.RepairStatus = 2;
                 checkRecordDetails.cretoredit += ", " + checkAccount.Name + " Create " + DateTime.UtcNow;
 
                 _context.repairrecords.Update(checkDataRecordRepair);
