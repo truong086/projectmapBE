@@ -108,6 +108,7 @@ namespace projectmap.Service
                 {
                     id = x.id,
                     name = x.Name,
+                    identity = x.Identity,
                     total = x.RepairDetails.Where(x1 => x1.RepairStatus != 4 && x1.RepairStatus != 5).Select(x2 => x2.RepairRecords).Count()
                 }).ToList();
 
@@ -133,6 +134,7 @@ namespace projectmap.Service
                 {
                     id = x.id,
                     name = x.Name,
+                    identity = x.Identity,
                     logandlat = x.RepairDetails.Where(x1 => x1.RepairStatus != 4 && x1.RepairStatus != 5).Select(x1 => new
                     {
                         log = x1.trafficEquipment.Longitude,
@@ -178,7 +180,9 @@ namespace projectmap.Service
                 var utcExpireDate = long.Parse(tokenInverification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
                 var expireDate = ConverunixTimeToDateTime(utcExpireDate);
-                if (expireDate > DateTime.UtcNow)
+                var timeRemaining = expireDate - DateTime.UtcNow;
+
+                if (timeRemaining.TotalMinutes <= 10 && timeRemaining.TotalMinutes > 0) // Nếu còn dưới hoặc bằng 10 phút
                 {
                     var claims = new List<Claim>
                     {

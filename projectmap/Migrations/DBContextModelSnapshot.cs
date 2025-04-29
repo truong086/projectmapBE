@@ -228,6 +228,9 @@ namespace projectmap.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Token")
+                        .HasColumnType("longtext");
+
                     b.Property<int?>("UserStatus")
                         .HasColumnType("int");
 
