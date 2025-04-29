@@ -36,6 +36,13 @@ namespace projectmap.Controllers
         }
 
         [HttpPost]
+        [Route(nameof(AddToken))]
+        public async Task<PayLoad<string>> AddToken(string token)
+        {
+            return await _userService.AddToken(token);
+        }
+
+        [HttpPost]
         [Route(nameof(Logout))]
         public async Task<PayLoad<string>> Logout()
         {
