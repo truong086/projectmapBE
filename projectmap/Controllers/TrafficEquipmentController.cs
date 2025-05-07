@@ -41,6 +41,55 @@ namespace projectmap.Controllers
         }
 
         [HttpGet]
+        [Route(nameof(FindAllNameDistric))]
+        public async Task<PayLoad<object>> FindAllNameDistric(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllNameDistric(name, page, pageSize);
+        }
+
+        [HttpGet]
+        [Route(nameof(GetNormal))]
+        public async Task<PayLoad<object>> GetNormal()
+        {
+            return await _trafficEquipmentService.GetNormal();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetNormalError))]
+        public async Task<PayLoad<object>> GetNormalError()
+        {
+            return await _trafficEquipmentService.GetNormalError();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetNormalDistrict))]
+        public async Task<PayLoad<object>> GetNormalDistrict()
+        {
+            return await _trafficEquipmentService.GetNormalDistrict();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetNormalDistrict2))]
+        public async Task<PayLoad<object>> GetNormalDistrict2()
+        {
+            return await _trafficEquipmentService.GetNormalDistrict2();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetNormalDistrictUpdate))]
+        public async Task<PayLoad<object>> GetNormalDistrictUpdate()
+        {
+            return await _trafficEquipmentService.GetNormalDistrictUpdate();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetNormalDistrictUpdate2))]
+        public async Task<PayLoad<object>> GetNormalDistrictUpdate2()
+        {
+            return await _trafficEquipmentService.GetNormalDistrictUpdate2();
+        }
+
+        [HttpGet]
         [Route(nameof(FindAllErrorCode0ByAccount))]
         public async Task<PayLoad<object>> FindAllErrorCode0ByAccount(int id, int page = 1, int pageSize = 20)
         {

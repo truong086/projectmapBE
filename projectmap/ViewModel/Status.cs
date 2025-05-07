@@ -56,6 +56,45 @@
         public static string ACCOUNTFAILD = "accounts Faild !!!";
         public static string NEW = "New";
         public static string OLD = "Old";
-        public static string REPAIRRECORD = "RepairRecord: "; 
+        public static string REPAIRRECORD = "RepairRecord: ";
+        public static List<string> listDataDisrtric = new List<string>() {
+        "東區",
+        "南區",
+        "北區",
+        "安南區",
+        "安平區",
+        "中西區",
+        "永康區",
+        "新營區",
+        "鹽水區",
+        "白河區",
+        "柳營區",
+        "後壁區",
+        "東山區",
+        "麻豆區",
+        "下營區",
+        "六甲區",
+        "官田區",
+        "大內區",
+        "佳里區",
+        "學甲區",
+        "西港區",
+        "七股區",
+        "將軍區",
+        "北門區",
+        "新化區",
+        "善化區",
+        "新市區",
+        "安定區",
+        "山上區",
+        "玉井區",
+        "楠西區",
+        "南化區",
+        "左鎮區",
+        "仁德區",
+        "歸仁區",
+        "關廟區",
+        "龍崎區"
+        };
     }
 }

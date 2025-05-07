@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using projectmap.Common;
 using projectmap.Models;
 using projectmap.ViewModel;
+using System;
 using System.Globalization;
 using System.Xml;
 using System.Xml.Linq;
@@ -438,7 +439,7 @@ namespace projectmap.Service
                     }
                     else
                     {
-                        checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name) || x.road1.Contains(name) || x.road2.Contains(name)).ToList();
+                        checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name) || x.road1.Contains(name) || x.road2.Contains(name) || x.districs.Contains(name)).ToList();
                     }
 
                     
@@ -1487,6 +1488,300 @@ namespace projectmap.Service
 
                 }
 
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> GetNormal()
+        {
+            try
+            {
+                int total = _context.trafficequipments.Where(x => !x.deleted).Count();
+
+                // Số đèn bị lỗi(distinct để tránh đếm trùng nếu có nhiều lỗi)
+                int errorLights = _context.repairdetails.Where(x => x.RepairStatus != 4 && x.RepairStatus != 5 && !x.deleted).Select(x => x.id).Distinct().Count();
+
+                if(total == 0)
+                    return await Task.FromResult(PayLoad<object>.Successfully(0));
+
+                double percentage = ((double)(total - errorLights) / total) * 100;
+
+                return await Task.FromResult(PayLoad<object>.Successfully(Math.Round(percentage, 2))); // Làm tròn 2 chữ số sau dấu phẩy
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> GetNormalDistrict()
+        {
+            try
+            {
+                var list = Status.listDataDisrtric;
+                if (list.Count <= 0)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                var listData = new Dictionary<string, int>();
+                foreach(var item in list)
+                {
+                    var dataCount = _context.repairdetails.Where(x => x.RepairStatus != 4 && x.RepairStatus != 5 && !x.deleted).AsNoTracking()
+                        .Select(x => new
+                        {
+                            name1 = x.trafficEquipment.District_1,
+                            name2 = x.trafficEquipment.District_2
+                        }).Select(x => new
+                        {
+                            district1 = x.name1,
+                            district2 = x.name2
+                        }).Where(x2 => x2.district1 == item || x2.district2 == item).Count();
+
+                    listData.Add(item, dataCount);
+                }
+
+                return await Task.FromResult(PayLoad<object>.Successfully(listData));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            } 
+        }
+
+        public async Task<PayLoad<object>> GetNormalDistrictUpdate()
+        {
+            try
+            {
+                var list = Status.listDataDisrtric;
+                if (list.Count <= 0)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                var listData = new Dictionary<string, int>();
+                foreach (var item in list)
+                {
+                    var dataCount = _context.repairdetails.Where(x => x.RepairStatus == 3 && !x.deleted).AsNoTracking()
+                        .Select(x => new
+                        {
+                            name1 = x.trafficEquipment.District_1,
+                            name2 = x.trafficEquipment.District_2
+                        }).Select(x => new
+                        {
+                            district1 = x.name1,
+                            district2 = x.name2
+                        }).Where(x2 => x2.district1 == item || x2.district2 == item).Count();
+
+                    listData.Add(item, dataCount);
+                }
+
+                return await Task.FromResult(PayLoad<object>.Successfully(listData));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> GetNormalDistrict2()
+        {
+            try
+            {
+                var list = Status.listDataDisrtric;
+                if (list.Count <= 0)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                var listData = new Dictionary<string, double>();
+                var total = _context.trafficequipments.Where(x => !x.deleted).Count();
+                foreach (var item in list)
+                {
+                    var dataCount = _context.repairdetails.Where(x => x.RepairStatus != 4 && x.RepairStatus != 5 && !x.deleted).AsNoTracking()
+                        .Select(x => new
+                        {
+                            name1 = x.trafficEquipment.District_1,
+                            name2 = x.trafficEquipment.District_2
+                        }).Select(x => new
+                        {
+                            district1 = x.name1,
+                            district2 = x.name2
+                        }).Where(x2 => x2.district1 == item || x2.district2 == item).Count();
+
+                    //double totalNumber = total == 0 ? 0 : (dataCount * 100.0) / total; // Tính phần trăm đèn bị hỏng trong tổng số đèn
+                    var totalNumber = ((double)(total - dataCount) / total) * 100; // Tính phần số đèn chưa hỏng
+                    listData.Add(item, Math.Round(totalNumber, 2));
+                }
+
+                return await Task.FromResult(PayLoad<object>.Successfully(listData));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> GetNormalDistrictUpdate2()
+        {
+            try
+            {
+                var list = Status.listDataDisrtric;
+                if (list.Count <= 0)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                var listData = new Dictionary<string, int>();
+                var total = _context.trafficequipments.Where(x => !x.deleted).Count();
+                foreach (var item in list)
+                {
+                    var dataCount = _context.repairdetails.Where(x => x.RepairStatus == 3 && !x.deleted).AsNoTracking()
+                        .Select(x => new
+                        {
+                            name1 = x.trafficEquipment.District_1,
+                            name2 = x.trafficEquipment.District_2
+                        }).Select(x => new
+                        {
+                            district1 = x.name1,
+                            district2 = x.name2
+                        }).Where(x2 => x2.district1 == item || x2.district2 == item).Count();
+
+                    //double totalNumber = total == 0 ? 0 : (dataCount * 100.0) / total; // Tính phần trăm đèn bị hỏng trong tổng số đèn
+                    //var totalNumber = ((double)(total - dataCount) / total) * 100; // Tính phần số đèn chưa hỏng
+                    listData.Add(item, dataCount);
+                }
+
+                return await Task.FromResult(PayLoad<object>.Successfully(listData));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> GetNormalError()
+        {
+            try
+            {
+                int total = _context.trafficequipments.Where(x => !x.deleted).Count();
+
+                // Số đèn bị lỗi(distinct để tránh đếm trùng nếu có nhiều lỗi)
+                int errorLights = _context.repairdetails.Where(x => x.RepairStatus != 4 && x.RepairStatus != 5 && !x.deleted).Select(x => x.id).Distinct().Count();
+
+                if (total == 0)
+                    return await Task.FromResult(PayLoad<object>.Successfully(0));
+
+                double percentage = (errorLights * 100.0) / total;
+
+                return await Task.FromResult(PayLoad<object>.Successfully(Math.Round(percentage, 2))); // Làm tròn 2 chữ số sau dấu phẩy
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllNameDistric(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var checkData = _context.trafficequipments
+    .Where(x => !x.deleted)
+    .AsNoTracking()
+    .Select(x => new
+    {
+        x.id,
+        x.CategoryCode,
+        x.IdentificationCode,
+        x.ManagementUnit,
+        x.JobClassification,
+        x.SignalNumber,
+        x.TypesOfSignal,
+        x.SignalInstallation,
+        x.UseStatus,
+        x.DataStatus,
+        x.Remark,
+        x.Length,
+        x.Longitude,
+        x.Latitude,
+        x.Road_1,
+        x.Road_2,
+        x.District_1,
+        FirstRepair = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus != 3)
+            .OrderBy(r => r.id)
+            .Select(r => new
+            {
+                r.RepairStatus,
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        FirstRepairUpdate = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
+            .OrderByDescending(r => r.FaultReportingTime)
+            .Select(r => new
+            {
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
+        totalEdit = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
+    })
+    .Select(x => new TrafficEquipmentGetAll
+    {
+        id = x.id,
+        isError = x.FirstRepair != null,
+        statusError = x.FirstRepair.RepairStatus ?? 0,
+        CategoryCode = x.CategoryCode,
+        IdentificationCode = x.IdentificationCode,
+        ManagementUnit = x.ManagementUnit,
+        JobClassification = x.JobClassification,
+        SignalNumber = x.SignalNumber,
+        TypesOfSignal = x.TypesOfSignal,
+        SignalInstallation = x.SignalInstallation,
+        UseStatus = x.UseStatus,
+        DataStatus = x.DataStatus,
+        Remark = x.Remark,
+        Length = x.Length,
+        Longitude = x.Longitude,
+        Latitude = x.Latitude,
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList(),
+        totalUpdate = x.totalEdit,
+        date = x.FirstRepair.date,
+        dateUpdate = x.FirstRepairUpdate.date,
+        account_userUpdate = x.FirstRepairUpdate.RepairRecord,
+        statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
+        isErrorUpdate = x.FirstRepairUpdate != null,
+        road1 = x.Road_1,
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1
+    })
+    .ToList();
+               
+                if (!string.IsNullOrEmpty(name))
+                {
+                    checkData = checkData.Where(x => x.districs.Contains(name)).ToList();
+                }
 
                 var pageList = new PageList<object>(checkData, page - 1, pageSize);
                 return await Task.FromResult(PayLoad<object>.Successfully(new
