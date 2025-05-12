@@ -68,6 +68,13 @@ namespace projectmap.Controllers
             return await _repairDetailsService.FindOneId(id);
         }
 
+        [HttpGet]
+        [Route(nameof(FindAllDone1month))]
+        public async Task<PayLoad<object>> FindAllDone1month()
+        {
+            return await _repairDetailsService.FindAllDone1month();
+        }
+
         [HttpPut]
         [Route(nameof(Update))]
         public async Task<PayLoad<RepairDetailsUpdate>> Update(RepairDetailsUpdate data)

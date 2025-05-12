@@ -169,6 +169,21 @@ namespace projectmap.Service
             }
         }
 
+        public async Task<PayLoad<object>> FindAllDone1month()
+        {
+            try
+            {
+                var date1month = DateTimeOffset.UtcNow.AddMonths(-1);
+
+                var checkData = _context.repairdetails.Where(x => x.RepairCompletionTime >= date1month && x.RepairStatus == 4).Count();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(checkData));
+            }catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
         public async Task<PayLoad<object>> FindAllDoneByAccount(string? name, int page = 1, int pageSize = 20)
         {
             try
@@ -442,6 +457,7 @@ namespace projectmap.Service
 
                 checkData.RepairStatus = 1;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkAccount.Name + " Update " + DateTime.UtcNow;
+                checkData.RepairCompletionTime = DateTimeOffset.UtcNow;
 
                 _context.repairdetails.Update(checkData);
                 _context.SaveChanges();
@@ -485,6 +501,7 @@ namespace projectmap.Service
                 checkData.RepairStatus = data.status;
                 checkData.cretoredit = checkData.cretoredit + ", " + checkAccountUpdateData.Name + " Update Status " + DateTime.UtcNow;
                 checkDataTraff.UseStatus = data.status == 4 ? 1 : 2;
+                checkData.RepairCompletionTime = DateTimeOffset.UtcNow;
 
                 _context.trafficequipments.Update(checkDataTraff);
                 _context.repairdetails.Update(checkData);
@@ -507,6 +524,7 @@ namespace projectmap.Service
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
 
                 checkId.RepairStatus = data.status;
+                checkId.RepairCompletionTime = DateTimeOffset.UtcNow;
 
                 _context.repairdetails.Update(checkId);
                 _context.SaveChanges();
@@ -530,6 +548,8 @@ namespace projectmap.Service
                 if (checkData.MaintenanceEngineer == null)
                     checkData.RepairStatus = 1;
                 else checkData.RepairStatus = 2;
+
+                checkData.RepairCompletionTime = DateTimeOffset.UtcNow;
 
                 _context.repairdetails.Update(checkData);
                 _context.SaveChanges();
@@ -564,6 +584,7 @@ namespace projectmap.Service
                 checkRecordDetails.user = checkAccountEngineer;
                 checkRecordDetails.RepairStatus = 2;
                 checkRecordDetails.cretoredit += ", " + checkAccount.Name + " Create " + DateTime.UtcNow;
+                checkRecordDetails.RepairCompletionTime = DateTimeOffset.UtcNow;
 
                 _context.repairrecords.Update(checkDataRecordRepair);
                 _context.repairdetails.Update(checkRecordDetails);
