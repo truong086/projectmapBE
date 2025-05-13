@@ -1798,5 +1798,61 @@ namespace projectmap.Service
                 return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
             }
         }
+
+        public async Task<PayLoad<object>> TotalError()
+        {
+            try
+            {
+                var data = _context.repairdetails.Where(x => x.RepairStatus != 4 && x.RepairStatus != 5 && !x.deleted).Count();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(data));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> TotalErrorUpdate()
+        {
+            try
+            {
+                var data = _context.repairdetails.Where(x => x.RepairStatus == 3 && !x.deleted).Count();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(data));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> TotalErrorNoUpdate()
+        {
+            try
+            {
+                var data = _context.repairdetails.Where(x => x.RepairStatus == 1 && !x.deleted).Count();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(data));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> TotalErrorNoUpdate2()
+        {
+            try
+            {
+                var data = _context.repairdetails.Where(x => x.RepairStatus == 2 && !x.deleted).Count();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(data));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace projectmap.Service
         Task<PayLoad<string>> LogOut();
         Task<PayLoad<object>> CheckToken(string token);
         Task<PayLoad<string>> AddToken(string token);
+        Task<PayLoad<object>> GenTokenOld();
     }
 }

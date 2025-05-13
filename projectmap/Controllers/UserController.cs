@@ -56,6 +56,14 @@ namespace projectmap.Controllers
             return await _userService.searchName(name);
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        [Route(nameof(GenTokenOld))]
+        public async Task<PayLoad<object>> GenTokenOld()
+        {
+            return await _userService.GenTokenOld();
+        }
+
         [HttpGet]
         [Route(nameof(searchId))]
         public async Task<PayLoad<object>> searchId(int id)

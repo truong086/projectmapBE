@@ -20,6 +20,10 @@ namespace projectmap.Service
         Task<PayLoad<object>> GetNormalDistrict2();
         Task<PayLoad<object>> GetNormalDistrictUpdate();
         Task<PayLoad<object>> GetNormalDistrictUpdate2();
+        Task<PayLoad<object>> TotalError();
+        Task<PayLoad<object>> TotalErrorUpdate();
+        Task<PayLoad<object>> TotalErrorNoUpdate();
+        Task<PayLoad<object>> TotalErrorNoUpdate2();
         Task<PayLoad<object>> FindAllNoError(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllNameDistric(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllErrorCode0ByAccount(int id, int page = 1, int pageSize = 20);

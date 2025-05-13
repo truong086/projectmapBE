@@ -152,6 +152,33 @@ namespace projectmap.Controllers
             return await _trafficEquipmentService.FindAllTest(name, page, pageSize);
         }
 
+        [HttpGet]
+        [Route(nameof(TotalError))]
+        public async Task<PayLoad<object>> TotalError()
+        {
+            return await _trafficEquipmentService.TotalError();
+        }
+        [HttpGet]
+        [Route(nameof(TotalErrorUpdate))]
+        public async Task<PayLoad<object>> TotalErrorUpdate()
+        {
+            return await _trafficEquipmentService.TotalErrorUpdate();
+        }
+
+        [HttpGet]
+        [Route(nameof(TotalErrorNoUpdate))]
+        public async Task<PayLoad<object>> TotalErrorNoUpdate()
+        {
+            return await _trafficEquipmentService.TotalErrorNoUpdate();
+        }
+
+        [HttpGet]
+        [Route(nameof(TotalErrorNoUpdate2))]
+        public async Task<PayLoad<object>> TotalErrorNoUpdate2()
+        {
+            return await _trafficEquipmentService.TotalErrorNoUpdate2();
+        }
+
         [HttpPost]
         [Route(nameof(LoadFile))]
         public async Task<PayLoad<object>> LoadFile(string path)

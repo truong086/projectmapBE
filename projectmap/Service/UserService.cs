@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -68,6 +69,7 @@ namespace projectmap.Service
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+       
 
         public async Task<PayLoad<RegisterDTO>> Register(RegisterDTO registerDTO)
         {
@@ -241,6 +243,42 @@ namespace projectmap.Service
             {
                 return await Task.FromResult(PayLoad<string>.CreatedFail(ex.Message));
             }
+        }
+
+        public async Task<PayLoad<object>> GenTokenOld()
+        {
+            try
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(Status.IDAUTHENTICATION, "1"),
+                    new Claim(JwtRegisteredClaimNames.Sub, "1")
+                };
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    token = GenerateTokenOld(claims)
+                }));
+            }
+            catch(Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        private string GenerateTokenOld(List<Claim>? claim)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+            var creadentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(_jwt.Issuer,
+                _jwt.Issuer,
+                notBefore: DateTime.UtcNow.AddMinutes(-20),  // Token có hiệu lực từ 20 phút trước
+                expires: DateTime.Now.AddMinutes(-10), // Hết hạn từ 10 phút trước
+                claims: claim,
+                signingCredentials: creadentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
