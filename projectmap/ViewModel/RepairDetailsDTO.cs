@@ -11,4 +11,10 @@ namespace projectmap.ViewModel
         public string? Remark { get; set; }
         public List<IFormFile>? images { get; set; }
     }
+
+    public class RepairDetailsUpdateImage
+    {
+        public int? id { get; set; }
+        public List<IFormFile>? images { get; set; }
+    }
 }

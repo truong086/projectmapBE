@@ -598,5 +598,45 @@ namespace projectmap.Service
                 return await Task.FromResult(PayLoad<ConfirmData>.CreatedFail(ex.Message));
             }
         }
+
+        public async Task<PayLoad<object>> UpdateImage(RepairDetailsUpdateImage data)
+        {
+            try
+            {
+                var checkData = _context.repairdetails.FirstOrDefault(x => x.id == data.id);
+                if (checkData == null)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                var checkDataRepaiRecord = _context.repairrecords.Where(x => x.RD_id == checkData.id).ToList();
+                if (checkDataRepaiRecord.Count <= 0)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+
+                for(int i = 0; i < checkDataRepaiRecord.Count; i++)
+                {
+                    var dataItem = checkDataRepaiRecord[i];
+                    if (dataItem.PublicId != null && dataItem.PublicId != "" && data.images != null && data.images.Count > 0)
+                    {
+                        uploadCloud.DeleteImageItemCloud(dataItem.PublicId);
+                    }
+
+                    if(data.images != null && data.images.Count > 0)
+                    {
+                        var dataImage = data.images[i];
+                        uploadCloud.CloudInaryIFromAccount(dataImage, Status.REPAIRRECORD + "" + dataItem.id.ToString(), _cloud);
+                        dataItem.PublicId = uploadCloud.publicId;
+                        dataItem.Picture = uploadCloud.Link;
+                    }
+
+                    _context.repairrecords.Update(dataItem);
+                    _context.SaveChanges();
+                }
+
+                return await Task.FromResult(PayLoad<object>.Successfully(data));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
     }
 }

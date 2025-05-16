@@ -10,6 +10,7 @@ namespace projectmap.Service
         Task<PayLoad<object>> FindAllDoneByAdmin(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllDoneByAccount(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllNoDoneByAccount(string? name, int page = 1, int pageSize = 20);
+        Task<PayLoad<object>> UpdateImage(RepairDetailsUpdateImage data);
         Task<PayLoad<object>> FindAllDone1month();
         Task<PayLoad<RepairDetailsDTO>> Add(RepairDetailsDTO data);
         Task<PayLoad<RepairDetailsUpdate>> Update(RepairDetailsUpdate data);

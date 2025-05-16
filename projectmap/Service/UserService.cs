@@ -30,7 +30,7 @@ namespace projectmap.Service
             try
             {
                 registerDTO.Password = EncryptionHelper.CreatePasswordHash(registerDTO.Password, _jwt.Key);
-                var checkData = _context.users.FirstOrDefault(x => x.Name == registerDTO.Name && x.Password == registerDTO.Password && !x.deleted);
+                var checkData = _context.users.Where(x => x.Name == registerDTO.Name && x.Password == registerDTO.Password && !x.deleted).FirstOrDefault();
                 if(checkData == null)
                     return await Task.FromResult(PayLoad<ReturnLogin>.CreatedFail(Status.DATATONTAI));
 
@@ -82,7 +82,7 @@ namespace projectmap.Service
                 registerDTO.Password = EncryptionHelper.CreatePasswordHash(registerDTO.Password, _jwt.Key);
 
                 var mapData = _mapper.Map<User>(registerDTO);
-                mapData.Identity = 3;
+                mapData.Identity = 2;
                 mapData.UserStatus = 0;
 
                 _context.users.Add(mapData);

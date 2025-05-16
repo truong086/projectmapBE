@@ -109,5 +109,12 @@ namespace projectmap.Controllers
         {
             return await _repairDetailsService.UpdateByOffClose(data);
         }
+
+        [HttpPut]
+        [Route(nameof(UpdateImage))]
+        public async Task<PayLoad<object>> UpdateImage([FromForm]RepairDetailsUpdateImage data)
+        {
+            return await _repairDetailsService.UpdateImage(data);
+        }
     }
 }
