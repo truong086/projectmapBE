@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("projectmap")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c08f06c2b28f2685d762e5f72e2869ef0fce9be4")]
 [assembly: System.Reflection.AssemblyProductAttribute("projectmap")]
 [assembly: System.Reflection.AssemblyTitleAttribute("projectmap")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
