@@ -17,10 +17,12 @@ namespace projectmap.Service
         private readonly DBContext _context;
         private readonly IMapper _mapper;
         private readonly string _apiKey = "AIzaSyBkgBNM7Mtgg6I3SvhOlwZCgqp7vFAPrS8";
-        public TrafficEquipmentService(DBContext context, IMapper mapper)
+        private readonly IUserTokenService _userTokenService;
+        public TrafficEquipmentService(DBContext context, IMapper mapper, IUserTokenService userTokenService)
         {
             _context = context;
             _mapper = mapper;
+            _userTokenService = userTokenService;
         }
         public async Task<PayLoad<TrafficEquipmentDTO>> Add(TrafficEquipmentDTO data)
         {
@@ -1848,6 +1850,143 @@ namespace projectmap.Service
                 var data = _context.repairdetails.Where(x => x.RepairStatus == 2 && !x.deleted).Count();
 
                 return await Task.FromResult(PayLoad<object>.Successfully(data));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
+
+        public async Task<PayLoad<object>> FindAllForEngineer(string? name, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var use = _userTokenService.name();
+                var checkDataAccount = _context.users.FirstOrDefault(x => x.id == Convert.ToInt32(use));
+                if(checkDataAccount == null)
+                    return await Task.FromResult(PayLoad<object>.CreatedFail(Status.DATANULL));
+                var checkData = _context.trafficequipments
+    .Where(x => !x.deleted)
+    .AsNoTracking()
+    .Select(x => new
+    {
+        x.id,
+        x.CategoryCode,
+        x.IdentificationCode,
+        x.ManagementUnit,
+        x.JobClassification,
+        x.SignalNumber,
+        x.TypesOfSignal,
+        x.SignalInstallation,
+        x.UseStatus,
+        x.DataStatus,
+        x.Remark,
+        x.Length,
+        x.Longitude,
+        x.Latitude,
+        x.Road_1,
+        x.Road_2,
+        x.District_1,
+        FirstRepair = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted)
+            .OrderBy(r => r.id)
+            .Select(r => new
+            {
+                r.id,
+                r.RepairStatus,
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        FirstRepairUpdate = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4)
+            .OrderByDescending(r => r.FaultReportingTime)
+            .Select(r => new
+            {
+                r.FaultCodes,
+                RepairRecord = r.RepairRecords
+                    .OrderBy(rr => rr.id)
+                    .Select(rr => rr.user.Name)
+                    .FirstOrDefault(),
+                date = r.FaultReportingTime
+            })
+            .FirstOrDefault(),
+        imageData = x.RepairDetails
+        .SelectMany(x => x.RepairRecords).Select(x2 => x2.Picture),
+        totalEdit = x.RepairDetails
+            .Where(r => r.TE_id == x.id && !r.deleted && r.RepairStatus == 4).Count()
+    })
+    .Select(x => new TrafficEquipmentGetAll
+    {
+        id = x.id,
+        isError = x.FirstRepair != null,
+        statusError = x.FirstRepair.RepairStatus ?? 0,
+        CategoryCode = x.CategoryCode,
+        IdentificationCode = x.IdentificationCode,
+        ManagementUnit = x.ManagementUnit,
+        JobClassification = x.JobClassification,
+        SignalNumber = x.SignalNumber,
+        TypesOfSignal = x.TypesOfSignal,
+        SignalInstallation = x.SignalInstallation,
+        UseStatus = x.UseStatus,
+        DataStatus = x.DataStatus,
+        Remark = x.Remark,
+        Length = x.Length,
+        Longitude = x.Longitude,
+        Latitude = x.Latitude,
+        account_user = x.FirstRepair != null ? x.FirstRepair.RepairRecord : null,
+        images = x.imageData.ToList(),
+        totalUpdate = x.totalEdit,
+        date = x.FirstRepair.date,
+        dateUpdate = x.FirstRepairUpdate.date,
+        account_userUpdate = x.FirstRepairUpdate.RepairRecord,
+        statusErrorUpdate = x.FirstRepairUpdate.FaultCodes ?? 0,
+        isErrorUpdate = x.FirstRepairUpdate != null,
+        road1 = x.Road_1,
+        road2 = x.Road_2,
+        statusErrorFauCode = x.FirstRepair.FaultCodes,
+        districs = x.District_1,
+        repaiDetail_id = x.FirstRepair.id
+    })
+    .Where(x => x.isError == true && x.account_user == checkDataAccount.Name && x.statusError != 4 && x.statusError != 5)
+    .ToList();
+
+
+                if (!string.IsNullOrEmpty(name))
+                {
+                    string[] coords = name.Trim().Split(',');
+                    if (coords.Count() == 2)
+                    {
+                        var Longitude = double.Parse(coords[0], CultureInfo.InvariantCulture);
+                        var Latitude = double.Parse(coords[1], CultureInfo.InvariantCulture);
+                        checkData = checkData.Where(x => x.Latitude == Latitude && x.Longitude == Longitude).ToList();
+                    }
+                    else if (int.TryParse(name, out int n))
+                    {
+                        checkData = checkData.Where(x => x.CategoryCode == n).ToList();
+                    }
+                    else
+                    {
+                        checkData = checkData.Where(x => x.SignalNumber.Contains(name) || x.ManagementUnit.Contains(name)).ToList();
+                    }
+
+
+                }
+
+
+                var pageList = new PageList<object>(checkData, page - 1, pageSize);
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = pageList,
+                    page,
+                    pageList.pageSize,
+                    pageList.totalCounts,
+                    pageList.totalPages
+                }));
             }
             catch (Exception ex)
             {

@@ -179,6 +179,13 @@ namespace projectmap.Controllers
             return await _trafficEquipmentService.TotalErrorNoUpdate2();
         }
 
+        [HttpGet]
+        [Route(nameof(FindAllForEngineer))]
+        public async Task<PayLoad<object>> FindAllForEngineer(string? name, int page = 1, int pageSize = 20)
+        {
+            return await _trafficEquipmentService.FindAllForEngineer(name, page, pageSize);
+        }
+
         [HttpPost]
         [Route(nameof(LoadFile))]
         public async Task<PayLoad<object>> LoadFile(string path)

@@ -7,6 +7,7 @@ namespace projectmap.Service
     {
         Task<PayLoad<RegisterDTO>> Register (RegisterDTO registerDTO);
         Task<PayLoad<object>> searchName (string? name);
+        Task<PayLoad<object>> searchNameByUser (string? name);
         Task<PayLoad<object>> searchId (int id);
         Task<PayLoad<ReturnLogin>> Login (RegisterDTO registerDTO);
         Task<PayLoad<string>> LogOut();

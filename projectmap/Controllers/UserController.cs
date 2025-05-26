@@ -56,6 +56,13 @@ namespace projectmap.Controllers
             return await _userService.searchName(name);
         }
 
+        [HttpGet]
+        [Route(nameof(searchNameByUser))]
+        public async Task<PayLoad<object>> searchNameByUser(string? name)
+        {
+            return await _userService.searchNameByUser(name);
+        }
+
         [AllowAnonymous]
         [HttpGet]
         [Route(nameof(GenTokenOld))]

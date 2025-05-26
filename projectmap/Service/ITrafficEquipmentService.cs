@@ -28,6 +28,7 @@ namespace projectmap.Service
         Task<PayLoad<object>> FindAllNameDistric(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllErrorCode0ByAccount(int id, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindAllTest(string? name, int page = 1, int pageSize = 20);
+        Task<PayLoad<object>> FindAllForEngineer(string? name, int page = 1, int pageSize = 20);
         Task<PayLoad<object>> FindOneId(int id);
         Task<PayLoad<object>> AddFile(string file);
     }

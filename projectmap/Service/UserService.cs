@@ -280,5 +280,33 @@ namespace projectmap.Service
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task<PayLoad<object>> searchNameByUser(string? name)
+        {
+            try
+            {
+                var use = _userTokenService.name();
+                var checkData = _context.users.Where(x => x.id == int.Parse(use)).Select(x => new
+                {
+                    id = x.id,
+                    name = x.Name,
+                    identity = x.Identity,
+                    total = x.RepairDetails.Where(x1 => x1.RepairStatus != 4 && x1.RepairStatus != 5).Select(x2 => x2.RepairRecords).Count()
+                }).ToList();
+
+                if (!string.IsNullOrEmpty(name))
+                    //checkData = checkData.Where(x => x.name.ToLower().Contains(name.ToLower())).ToList();
+                    checkData = checkData.Where(x => x.name.Contains(name)).ToList();
+
+                return await Task.FromResult(PayLoad<object>.Successfully(new
+                {
+                    data = checkData
+                }));
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(PayLoad<object>.CreatedFail(ex.Message));
+            }
+        }
     }
 }
