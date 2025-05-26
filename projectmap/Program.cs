@@ -53,7 +53,7 @@ corsBuilder.WithOrigins("https://tsmms.tw"); // Đây là Url bên frontEnd
 corsBuilder.AllowCredentials();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", corsBuilder.Build());
+    options.AddPolicy("AllowFrontend", corsBuilder.Build());
 });
 
 #endregion
@@ -189,7 +189,7 @@ if (app.Environment.IsDevelopment() || true)
 app.UseResponseCompression();
 app.UseHttpsRedirection();
 
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowFrontend");
 
 app.UseCookiePolicy();
 app.UseRouting();
