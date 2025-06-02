@@ -479,7 +479,7 @@ namespace projectmap.Service
                 if(checkData == null)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
 
-                if(data.status > 3 || data.status < 0)
+                if(data.status > 4 || data.status < 0)
                     return await Task.FromResult(PayLoad<RepairDetailsUpdateByAccont>.CreatedFail(Status.DATANULL));
 
                 var checkRecordRepairDetails = _context.repairrecords.Include(u => u.user).FirstOrDefault(x => x.RD_id == checkData.id);
